@@ -59,9 +59,9 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postStack(String nodeCount) {
+    def String postStack(String stackName, String nodeCount) {
         log.debug("Posting stack ...")
-        def binding = ["NODE_COUNT": nodeCount]
+        def binding = ["NODE_COUNT": nodeCount, "STACK_NAME": stackName]
         def response = processPost(Resource.STACKS, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
