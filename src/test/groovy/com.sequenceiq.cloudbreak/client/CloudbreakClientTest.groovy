@@ -35,7 +35,11 @@ class CloudbreakClientTest extends Specification {
 
         )
         log.debug("RESP: {}", resp)
-
     }
 
+    def "test post cluster"() {
+        expect:
+        Object resp = cloudbreakClient.postCluster("test", 52, 51)
+        log.debug("RESP: {}", resp)
+    }
 }

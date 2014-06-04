@@ -15,7 +15,7 @@ class CloudbreakClient {
         TEMPLATES("template", "template.json"),
         STACKS("stack", "stack.json"),
         BLUEPRINTS("blueprint", "blueprint.json"),
-        CLUSTERS("cluster", "cluster.json")
+        CLUSTERS("stack/stack-id/cluster", "cluster.json")
         def path
         def template
 
@@ -75,10 +75,13 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postCluster(String clusterName, Integer blueprintId) {
+    def String postCluster(String clusterName, Integer blueprintId, Integer stackId) {
         log.debug("Posting cluster ...")
         def binding = ["CLUSTER_NAME": clusterName, "BLUEPRINT_ID": blueprintId]
-        def response = processPost(Resource.CLUSTERS, binding)
+        def json = createJson(Resource.CLUSTERS.template(), binding)
+        String path = Resource.CLUSTERS.path().replaceFirst("stack-id", stackId.toString())
+        def Map postCtx = createPostRequestContext(path, ['json': json])
+        def response = doPost(postCtx)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
@@ -120,13 +123,13 @@ class CloudbreakClient {
         return getOne(Resource.BLUEPRINTS, id)
     }
 
-    private List getAllAsList(Resource resource) {
+    def private List getAllAsList(Resource resource) {
         Map getCtx = createGetRequestContext(resource.path(), [:]);
         Object response = doGet(getCtx);
         return response?.data
     }
 
-    private Object getOne(Resource resource, String id) {
+    def private Object getOne(Resource resource, String id) {
         String path = resource.path() + "/$id"
         Map getCtx = createGetRequestContext(path, [:]);
         Object response = doGet(getCtx)
@@ -175,7 +178,7 @@ class CloudbreakClient {
         return json;
     }
 
-    private Object processPost(Resource resource, Map binding) {
+    def private Object processPost(Resource resource, Map binding) {
         def json = createJson(resource.template(), binding)
         def Map postCtx = createPostRequestContext(resource.path(), ['json': json])
         return doPost(postCtx)
