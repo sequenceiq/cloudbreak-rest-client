@@ -10,16 +10,16 @@ import groovyx.net.http.RESTClient
 @Slf4j
 class CloudbreakClient {
 
-    def private enum RESOURCE {
+    def private enum Resource {
         CREDENTIALS("credential", "credentials.json"),
         TEMPLATES("template", "template.json"),
         STACKS("stack", "stack.json"),
-        BLUEPRINTS("blueprints", "blueprint.json"),
-        CLUSTERS("clusters", "cluster.json")
+        BLUEPRINTS("blueprint", "blueprint.json"),
+        CLUSTERS("cluster", "cluster.json")
         def path
         def template
 
-        RESOURCE(path, template) {
+        Resource(path, template) {
             this.path = path
             this.template = template
         }
@@ -43,11 +43,10 @@ class CloudbreakClient {
         restClient.headers['Authorization'] = 'Basic ' + "$user:$password".getBytes('iso-8859-1').encodeBase64()
     }
 
-
     def String postCredentials() {
         log.debug("Posting credentials ...")
         def binding = [:]
-        def response = processPost(RESOURCE.CREDENTIALS, binding)
+        def response = processPost(Resource.CREDENTIALS, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
@@ -55,7 +54,7 @@ class CloudbreakClient {
     def String postTemplate(String name) {
         log.debug("Posting template ...")
         def binding = ["NAME": "$name"]
-        def response = processPost(RESOURCE.TEMPLATES, binding)
+        def response = processPost(Resource.TEMPLATES, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
@@ -63,7 +62,7 @@ class CloudbreakClient {
     def String postStack(String nodeCount) {
         log.debug("Posting stack ...")
         def binding = ["NODE_COUNT": nodeCount]
-        def response = processPost(RESOURCE.STACKS, binding)
+        def response = processPost(Resource.STACKS, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
@@ -71,15 +70,15 @@ class CloudbreakClient {
     def String postBlueprint(String blueprint) {
         log.debug("Posting blueprint ...")
         def binding = ["BLUEPRINT": blueprint]
-        def response = processPost(RESOURCE.BLUEPRINTS, binding)
+        def response = processPost(Resource.BLUEPRINTS, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
 
-    def String postCluster(String clusterName) {
+    def String postCluster(String clusterName, Integer blueprintId) {
         log.debug("Posting cluster ...")
-        def binding = ["CLUSTER_NAME": clusterName]
-        def response = processPost(RESOURCE.CLUSTERS, binding)
+        def binding = ["CLUSTER_NAME": clusterName, "BLUEPRINT_ID": blueprintId]
+        def response = processPost(Resource.CLUSTERS, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
@@ -89,6 +88,49 @@ class CloudbreakClient {
         Map getCtx = createGetRequestContext('health', null)
         Object healthObj = doGet(getCtx)
         return healthObj.data.status == 'ok'
+    }
+
+    def List<Map> getCredentials() {
+        log.debug("Getting credentials...")
+        getAllAsList(Resource.CREDENTIALS)
+    }
+
+    def List<Map> getBlueprints() {
+        log.debug("Getting blueprints...")
+        getAllAsList(Resource.BLUEPRINTS)
+    }
+
+    def List<Map> getTemplates() {
+        log.debug("Getting templates...")
+        getAllAsList(Resource.TEMPLATES)
+    }
+
+    def Object getCredential(String id) {
+        log.debug("Getting credentials...")
+        return getOne(Resource.CREDENTIALS, id)
+    }
+
+    def Object getTemplate(String id) {
+        log.debug("Getting credentials...")
+        return getOne(Resource.TEMPLATES, id)
+    }
+
+    def Object getBlueprint(String id) {
+        log.debug("Getting credentials...")
+        return getOne(Resource.BLUEPRINTS, id)
+    }
+
+    private List getAllAsList(Resource resource) {
+        Map getCtx = createGetRequestContext(resource.path(), [:]);
+        Object response = doGet(getCtx);
+        return response?.data
+    }
+
+    private Object getOne(Resource resource, String id) {
+        String path = resource.path() + "/$id"
+        Map getCtx = createGetRequestContext(path, [:]);
+        Object response = doGet(getCtx)
+        return response?.data
     }
 
     def private Object doGet(Map getCtx) {
@@ -124,7 +166,6 @@ class CloudbreakClient {
         putRequestMap.put('path', uri)
         putRequestMap.put('body', ctx.get("json"));
         putRequestMap.put('requestContentType', ContentType.JSON)
-
         return putRequestMap
     }
 
@@ -134,10 +175,10 @@ class CloudbreakClient {
         return json;
     }
 
-    private processPost(RESOURCE resource, Map binding) {
+    private Object processPost(Resource resource, Map binding) {
         def json = createJson(resource.template(), binding)
         def Map postCtx = createPostRequestContext(resource.path(), ['json': json])
-        def response = doPost(postCtx)
+        return doPost(postCtx)
     }
 }
 
