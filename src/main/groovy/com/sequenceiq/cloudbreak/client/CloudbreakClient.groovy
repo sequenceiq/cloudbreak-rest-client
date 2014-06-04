@@ -75,11 +75,11 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postCluster(String clusterName, Integer blueprintId, Integer templateId) {
+    def String postCluster(String clusterName, Integer blueprintId, Integer stackId) {
         log.debug("Posting cluster ...")
         def binding = ["CLUSTER_NAME": clusterName, "BLUEPRINT_ID": blueprintId]
         def json = createJson(Resource.CLUSTERS.template(), binding)
-        String path = Resource.CLUSTERS.path().replaceFirst("stack-id", templateId.toString())
+        String path = Resource.CLUSTERS.path().replaceFirst("stack-id", stackId.toString())
         def Map postCtx = createPostRequestContext(path, ['json': json])
         def response = doPost(postCtx)
         log.debug("Got response: {}", response.data.id)
