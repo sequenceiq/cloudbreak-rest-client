@@ -11,8 +11,26 @@ import groovyx.net.http.RESTClient
 class CloudbreakClient {
 
     def private enum RESOURCE {
-        CREDENTIALS, TEMPLATES, STACKS, BLUEPRINTS, CLUSTERS
+        CREDENTIALS("credential", "credentials.json"),
+        TEMPLATES("template", "template.json"),
+        STACKS("stack", "stack.json"),
+        BLUEPRINTS("blueprints", "blueprint.json"),
+        CLUSTERS("clusters", "cluster.json")
+        def path
+        def template
 
+        RESOURCE(path, template) {
+            this.path = path
+            this.template = template
+        }
+
+        def String path() {
+            return this.path
+        }
+
+        def String template() {
+            return this.template
+        }
     }
 
     def RESTClient restClient;
@@ -26,7 +44,7 @@ class CloudbreakClient {
     }
 
 
-    def Object postCredentials() {
+    def String postCredentials() {
         log.debug("Posting credentials ...")
         def binding = [:]
         def templateName = "credentials.json"
@@ -37,7 +55,7 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def Object postTemplate() {
+    def String postTemplate() {
         log.debug("Posting template ...")
         def binding = [:]
         def templateName = "template.json"
@@ -48,7 +66,7 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def Object postStack() {
+    def String postStack() {
         log.debug("Posting stack ...")
         def binding = [:]
         def templateName = "stack.json"
@@ -59,7 +77,7 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def Object postBluebrint() {
+    def String postBluebrint() {
         log.debug("Posting blueprint ...")
         def binding = [:]
         def templateName = "blueprint.json"
@@ -71,7 +89,7 @@ class CloudbreakClient {
 
     }
 
-    def Object postCluster() {
+    def String postCluster() {
         log.debug("Posting cluster ...")
         def binding = [:]
         def templateName = "cluster.json"
@@ -83,7 +101,7 @@ class CloudbreakClient {
 
     }
 
-    def health() {
+    def boolean health() {
         log.debug("Checking health ...")
         Map getCtx = createGetRequestContext('health', null)
         Object healthObj = doGet(getCtx)
