@@ -19,8 +19,15 @@ class CloudbreakClientTest extends Specification {
     def "test post credentials"() {
 
         expect:
-        Object resp = cloudbreakClient.getCredential("52")
+        Object resp = cloudbreakClient.postBlueprint("Blueprint mamam")
         log.debug("RESP: {}", resp)
+    }
+
+    def "test get credentials"(){
+        expect:
+        Object resp = cloudbreakClient.getCredentials()
+        log.debug("RESP: {}", resp)
+
     }
 
 }

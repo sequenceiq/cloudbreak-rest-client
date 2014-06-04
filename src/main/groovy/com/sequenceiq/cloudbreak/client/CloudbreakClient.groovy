@@ -43,7 +43,6 @@ class CloudbreakClient {
         restClient.headers['Authorization'] = 'Basic ' + "$user:$password".getBytes('iso-8859-1').encodeBase64()
     }
 
-
     def String postCredentials() {
         log.debug("Posting credentials ...")
         def binding = [:]
@@ -76,9 +75,9 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postCluster(String clusterName) {
+    def String postCluster(String clusterName, Integer blueprintId) {
         log.debug("Posting cluster ...")
-        def binding = ["CLUSTER_NAME": clusterName]
+        def binding = ["CLUSTER_NAME": clusterName, "BLUEPRINT_ID": blueprintId]
         def response = processPost(Resource.CLUSTERS, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
@@ -91,17 +90,17 @@ class CloudbreakClient {
         return healthObj.data.status == 'ok'
     }
 
-    def List getCredentials() {
+    def List<Map> getCredentials() {
         log.debug("Getting credentials...")
         getAllAsList(Resource.CREDENTIALS)
     }
 
-    def List getBlueprints() {
+    def List<Map> getBlueprints() {
         log.debug("Getting blueprints...")
         getAllAsList(Resource.BLUEPRINTS)
     }
 
-    def List getTemplates() {
+    def List<Map> getTemplates() {
         log.debug("Getting templates...")
         getAllAsList(Resource.TEMPLATES)
     }
@@ -133,7 +132,6 @@ class CloudbreakClient {
         Object response = doGet(getCtx)
         return response?.data
     }
-
 
     def private Object doGet(Map getCtx) {
         Object response = null;
@@ -168,7 +166,6 @@ class CloudbreakClient {
         putRequestMap.put('path', uri)
         putRequestMap.put('body', ctx.get("json"));
         putRequestMap.put('requestContentType', ContentType.JSON)
-
         return putRequestMap
     }
 
@@ -178,10 +175,10 @@ class CloudbreakClient {
         return json;
     }
 
-    private processPost(Resource resource, Map binding) {
+    private Object processPost(Resource resource, Map binding) {
         def json = createJson(resource.template(), binding)
         def Map postCtx = createPostRequestContext(resource.path(), ['json': json])
-        doPost(postCtx)
+        return doPost(postCtx)
     }
 }
 

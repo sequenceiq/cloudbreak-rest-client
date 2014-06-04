@@ -1,1 +1,3 @@
-$BLUEPRINT
+{
+    "ambariBlueprint" : "$BLUEPRINT"
+}
