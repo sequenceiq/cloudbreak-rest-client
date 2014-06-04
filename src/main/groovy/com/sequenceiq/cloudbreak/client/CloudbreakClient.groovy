@@ -4,6 +4,7 @@ import groovy.json.JsonSlurper
 import groovy.text.SimpleTemplateEngine
 import groovy.text.TemplateEngine
 import groovy.util.logging.Slf4j
+import groovyx.net.http.ContentType
 import groovyx.net.http.RESTClient
 
 @Slf4j
@@ -14,7 +15,7 @@ class CloudbreakClient {
     def slurper = new JsonSlurper()
 
 
-    CloudbreakClient(host = 'cloudbreak.sequenceiq.com', port = '80', user = 'user@seq.com', password = 'test123') {
+    CloudbreakClient(host = '192.168.100.43', port = '8080', user = 'user@seq.com', password = 'test123') {
         restClient = new RESTClient("http://${host}:${port}/" as String)
         restClient.headers['Authorization'] = 'Basic ' + "$user:$password".getBytes('iso-8859-1').encodeBase64()
     }
@@ -25,8 +26,10 @@ class CloudbreakClient {
         def binding = [:]
         def templateName = "credentials.json"
         def json = createJson(templateName, binding)
-        def Map postCtx = createPostRequestContext("credential", 'json': json)
-        doPost(postCtx)
+        def Map postCtx = createPostRequestContext("credential", ['json': json])
+        def response = doPost(postCtx)
+        log.debug("Got response: {}", response.data.id)
+        return response?.data?.id
     }
 
     def Object postTemplate() {
@@ -35,8 +38,9 @@ class CloudbreakClient {
         def templateName = "template.json"
         def json = createJson(templateName, binding)
         def Map postCtx = createPostRequestContext("template", 'json': json)
-        doPost(postCtx)
-
+        def response = doPost(postCtx)
+        log.debug("Got response: {}", response.data.id)
+        return response?.data?.id
     }
 
     def Object postStack() {
@@ -45,7 +49,9 @@ class CloudbreakClient {
         def templateName = "stack.json"
         def json = createJson(templateName, binding)
         def Map postCtx = createPostRequestContext("stack", 'json': json)
-        doPost(postCtx)
+        def response = doPost(postCtx)
+        log.debug("Got response: {}", response.data.id)
+        return response?.data?.id
     }
 
     def Object postBluebrint() {
@@ -54,7 +60,10 @@ class CloudbreakClient {
         def templateName = "blueprint.json"
         def json = createJson(templateName, binding)
         def Map postCtx = createPostRequestContext("blueprints", 'json': json)
-        doPost(postCtx)
+        def response = doPost(postCtx)
+        log.debug("Got response: {}", response.data.id)
+        return response?.data?.id
+
     }
 
     def Object postCluster() {
@@ -63,7 +72,10 @@ class CloudbreakClient {
         def templateName = "cluster.json"
         def json = createJson(templateName, binding)
         def Map postCtx = createPostRequestContext("cluster", 'json': json)
-        doPost(postCtx)
+        def response = doPost(postCtx)
+        log.debug("Got response: {}", response.data.id)
+        return response?.data?.id
+
     }
 
     def health() {
@@ -102,12 +114,12 @@ class CloudbreakClient {
 
     def private Map createPostRequestContext(String resourcePath, Map ctx) {
         def Map<String, ?> putRequestMap = [:]
-        String uri = "${restClient.uri}$resourcePath"
-        putRequestMap.put('path', "uri")
+        def String uri = "${restClient.uri}$resourcePath"
+        putRequestMap.put('path', uri)
         putRequestMap.put('body', ctx.get("json"));
+        putRequestMap.put('requestContentType', ContentType.JSON)
 
         return putRequestMap
-
     }
 
     def private String createJson(String templateName, Map bindings) {
