@@ -11,8 +11,26 @@ import groovyx.net.http.RESTClient
 class CloudbreakClient {
 
     def private enum RESOURCE {
-        CREDENTIALS, TEMPLATES, STACKS, BLUEPRINTS, CLUSTERS
+        CREDENTIALS("credential", "credentials.json"),
+        TEMPLATES("template", "template.json"),
+        STACKS("stack", "stack.json"),
+        BLUEPRINTS("blueprints", "blueprint.json"),
+        CLUSTERS("clusters", "cluster.json")
+        def path
+        def template
 
+        RESOURCE(path, template) {
+            this.path = path
+            this.template = template
+        }
+
+        def String path() {
+            return this.path
+        }
+
+        def String template() {
+            return this.template
+        }
     }
 
     def RESTClient restClient;
@@ -26,64 +44,47 @@ class CloudbreakClient {
     }
 
 
-    def Object postCredentials() {
+    def String postCredentials() {
         log.debug("Posting credentials ...")
         def binding = [:]
-        def templateName = "credentials.json"
-        def json = createJson(templateName, binding)
-        def Map postCtx = createPostRequestContext("credential", ['json': json])
-        def response = doPost(postCtx)
+        def response = processPost(RESOURCE.CREDENTIALS, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
 
-    def Object postTemplate() {
+    def String postTemplate(String name) {
         log.debug("Posting template ...")
-        def binding = [:]
-        def templateName = "template.json"
-        def json = createJson(templateName, binding)
-        def Map postCtx = createPostRequestContext("template", 'json': json)
-        def response = doPost(postCtx)
+        def binding = ["NAME": "$name"]
+        def response = processPost(RESOURCE.TEMPLATES, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
 
-    def Object postStack() {
+    def String postStack(String nodeCount) {
         log.debug("Posting stack ...")
-        def binding = [:]
-        def templateName = "stack.json"
-        def json = createJson(templateName, binding)
-        def Map postCtx = createPostRequestContext("stack", 'json': json)
-        def response = doPost(postCtx)
+        def binding = ["NODE_COUNT": nodeCount]
+        def response = processPost(RESOURCE.STACKS, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
 
-    def Object postBluebrint() {
+    def String postBlueprint(String blueprint) {
         log.debug("Posting blueprint ...")
-        def binding = [:]
-        def templateName = "blueprint.json"
-        def json = createJson(templateName, binding)
-        def Map postCtx = createPostRequestContext("blueprints", 'json': json)
-        def response = doPost(postCtx)
+        def binding = ["BLUEPRINT": blueprint]
+        def response = processPost(RESOURCE.BLUEPRINTS, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
-
     }
 
-    def Object postCluster() {
+    def String postCluster(String clusterName) {
         log.debug("Posting cluster ...")
-        def binding = [:]
-        def templateName = "cluster.json"
-        def json = createJson(templateName, binding)
-        def Map postCtx = createPostRequestContext("cluster", 'json': json)
-        def response = doPost(postCtx)
+        def binding = ["CLUSTER_NAME": clusterName]
+        def response = processPost(RESOURCE.CLUSTERS, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
-
     }
 
-    def health() {
+    def boolean health() {
         log.debug("Checking health ...")
         Map getCtx = createGetRequestContext('health', null)
         Object healthObj = doGet(getCtx)
@@ -131,6 +132,12 @@ class CloudbreakClient {
         def InputStream inPut = this.getClass().getClassLoader().getResourceAsStream("templates/${templateName}");
         String json = engine.createTemplate(new InputStreamReader(inPut)).make(bindings);
         return json;
+    }
+
+    private processPost(RESOURCE resource, Map binding) {
+        def json = createJson(resource.template(), binding)
+        def Map postCtx = createPostRequestContext(resource.path(), ['json': json])
+        def response = doPost(postCtx)
     }
 }
 

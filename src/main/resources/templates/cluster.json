@@ -1,4 +1,4 @@
 {
-   "clusterName":"full-cloudbreak-api",
+   "clusterName":"$CLUSTER_NAME",
    "blueprintId":52
 }

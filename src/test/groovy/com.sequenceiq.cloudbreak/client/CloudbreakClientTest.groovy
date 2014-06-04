@@ -19,7 +19,7 @@ class CloudbreakClientTest extends Specification {
     def "test post credentials"() {
 
         expect:
-        cloudbreakClient.postCredentials()
+        cloudbreakClient.postBlueprint("blueprint")
     }
 
 }
