@@ -52,33 +52,33 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postTemplate() {
+    def String postTemplate(String name) {
         log.debug("Posting template ...")
-        def binding = [:]
+        def binding = ["NAME": "$name"]
         def response = processPost(RESOURCE.TEMPLATES, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
 
-    def String postStack() {
+    def String postStack(String nodeCount) {
         log.debug("Posting stack ...")
-        def binding = [:]
+        def binding = ["NODE_COUNT": nodeCount]
         def response = processPost(RESOURCE.STACKS, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
 
-    def String postBluebrint() {
+    def String postBlueprint(String blueprint) {
         log.debug("Posting blueprint ...")
-        def binding = [:]
+        def binding = ["BLUEPRINT": blueprint]
         def response = processPost(RESOURCE.BLUEPRINTS, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
 
-    def String postCluster() {
+    def String postCluster(String clusterName) {
         log.debug("Posting cluster ...")
-        def binding = [:]
+        def binding = ["CLUSTER_NAME": clusterName]
         def response = processPost(RESOURCE.CLUSTERS, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
@@ -136,7 +136,7 @@ class CloudbreakClient {
 
     private processPost(RESOURCE resource, Map binding) {
         def json = createJson(resource.template(), binding)
-        def Map postCtx = createPostRequestContext(resource.path(), 'json': json)
+        def Map postCtx = createPostRequestContext(resource.path(), ['json': json])
         def response = doPost(postCtx)
     }
 }

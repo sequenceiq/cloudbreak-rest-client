@@ -1,5 +1,5 @@
 {
-   "nodeCount":3,
+   "nodeCount":$NODE_COUNT,
    "templateId":"52",
    "name":"sundaywork2",
    "credentialId":"52"
