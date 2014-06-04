@@ -47,10 +47,7 @@ class CloudbreakClient {
     def String postCredentials() {
         log.debug("Posting credentials ...")
         def binding = [:]
-        def templateName = "credentials.json"
-        def json = createJson(templateName, binding)
-        def Map postCtx = createPostRequestContext("credential", ['json': json])
-        def response = doPost(postCtx)
+        def response = processPost(RESOURCE.CREDENTIALS, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
@@ -58,10 +55,7 @@ class CloudbreakClient {
     def String postTemplate() {
         log.debug("Posting template ...")
         def binding = [:]
-        def templateName = "template.json"
-        def json = createJson(templateName, binding)
-        def Map postCtx = createPostRequestContext("template", 'json': json)
-        def response = doPost(postCtx)
+        def response = processPost(RESOURCE.TEMPLATES, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
@@ -69,10 +63,7 @@ class CloudbreakClient {
     def String postStack() {
         log.debug("Posting stack ...")
         def binding = [:]
-        def templateName = "stack.json"
-        def json = createJson(templateName, binding)
-        def Map postCtx = createPostRequestContext("stack", 'json': json)
-        def response = doPost(postCtx)
+        def response = processPost(RESOURCE.STACKS, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
@@ -80,25 +71,17 @@ class CloudbreakClient {
     def String postBluebrint() {
         log.debug("Posting blueprint ...")
         def binding = [:]
-        def templateName = "blueprint.json"
-        def json = createJson(templateName, binding)
-        def Map postCtx = createPostRequestContext("blueprints", 'json': json)
-        def response = doPost(postCtx)
+        def response = processPost(RESOURCE.BLUEPRINTS, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
-
     }
 
     def String postCluster() {
         log.debug("Posting cluster ...")
         def binding = [:]
-        def templateName = "cluster.json"
-        def json = createJson(templateName, binding)
-        def Map postCtx = createPostRequestContext("cluster", 'json': json)
-        def response = doPost(postCtx)
+        def response = processPost(RESOURCE.CLUSTERS, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
-
     }
 
     def boolean health() {
@@ -149,6 +132,12 @@ class CloudbreakClient {
         def InputStream inPut = this.getClass().getClassLoader().getResourceAsStream("templates/${templateName}");
         String json = engine.createTemplate(new InputStreamReader(inPut)).make(bindings);
         return json;
+    }
+
+    private processPost(RESOURCE resource, Map binding) {
+        def json = createJson(resource.template(), binding)
+        def Map postCtx = createPostRequestContext(resource.path(), 'json': json)
+        def response = doPost(postCtx)
     }
 }
 
