@@ -10,12 +10,17 @@ import groovyx.net.http.RESTClient
 @Slf4j
 class CloudbreakClient {
 
+    def private enum RESOURCE {
+        CREDENTIALS, TEMPLATES, STACKS, BLUEPRINTS, CLUSTERS
+
+    }
+
     def RESTClient restClient;
     def TemplateEngine engine = new SimpleTemplateEngine()
     def slurper = new JsonSlurper()
 
 
-    CloudbreakClient(host = '192.168.100.43', port = '8080', user = 'user@seq.com', password = 'test123') {
+    CloudbreakClient(host = 'localhost', port = '8080', user = 'user@seq.com', password = 'test123') {
         restClient = new RESTClient("http://${host}:${port}/" as String)
         restClient.headers['Authorization'] = 'Basic ' + "$user:$password".getBytes('iso-8859-1').encodeBase64()
     }
