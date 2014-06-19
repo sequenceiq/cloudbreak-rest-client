@@ -92,7 +92,7 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def void postCluster(String clusterName, Integer blueprintId, String descition, Integer stackId) {
+    def void postCluster(String clusterName, Integer blueprintId, String descrition, Integer stackId) {
         log.debug("Posting cluster ...")
         def binding = ["CLUSTER_NAME": clusterName, "BLUEPRINT_ID": blueprintId, "DESCRIPTION": descition]
         def json = createJson(Resource.CLUSTERS.template(), binding)
