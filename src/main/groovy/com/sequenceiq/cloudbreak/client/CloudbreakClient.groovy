@@ -84,7 +84,7 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String tStatEc2Template(String name, String description, String region, String amiId, String keyName, String sshLocation, String instanceType) {
+    def String postEc2Template(String name, String description, String region, String amiId, String keyName, String sshLocation, String instanceType) {
         log.debug("testing credential ...")
         def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "DESCRIPTION": description, "REGION": region, "AMI": amiId, "KEYNAME": keyName, "SSH_LOCATION":sshLocation, "INSTANCE_TYPE":instanceType]
         def response = processPost(Resource.TEMPLATES, binding)
