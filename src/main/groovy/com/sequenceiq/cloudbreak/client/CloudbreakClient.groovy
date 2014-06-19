@@ -60,9 +60,9 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postStack(String stackName, String nodeCount) {
+    def String postStack(String stackName, String nodeCount, String credentialId, String templateId) {
         log.debug("Posting stack ...")
-        def binding = ["NODE_COUNT": nodeCount, "STACK_NAME": stackName]
+        def binding = ["NODE_COUNT": nodeCount, "STACK_NAME": stackName, "CREDENTIAL_ID": credentialId, "TEMPLATE_ID": templateId]
         def response = processPost(Resource.STACKS, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
@@ -92,9 +92,9 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def void postCluster(String clusterName, Integer blueprintId, Integer stackId) {
+    def void postCluster(String clusterName, Integer blueprintId, String descition, Integer stackId) {
         log.debug("Posting cluster ...")
-        def binding = ["CLUSTER_NAME": clusterName, "BLUEPRINT_ID": blueprintId]
+        def binding = ["CLUSTER_NAME": clusterName, "BLUEPRINT_ID": blueprintId, "DESCRIPTION": descition]
         def json = createJson(Resource.CLUSTERS.template(), binding)
         String path = Resource.CLUSTERS.path().replaceFirst("stack-id", stackId.toString())
         def Map postCtx = createPostRequestContext(path, ['json': json])
@@ -172,6 +172,13 @@ class CloudbreakClient {
         result ?: new HashMap()
     }
 
+    def Map<String, String> getClustersMap() {
+        def result = getClusters().collectEntries {
+            [(it.id as String): it.cluster + ":" + it.status]
+        }
+        result ?: new HashMap()
+    }
+
     def List<Map> getTemplates() {
         log.debug("Getting templates...")
         getAllAsList(Resource.TEMPLATES)
@@ -182,9 +189,19 @@ class CloudbreakClient {
         getAllAsList(Resource.STACKS)
     }
 
+    def List<Map> getClusters() {
+        log.debug("Getting clusters...")
+        getAllAsList(Resource.CLUSTERS, id)
+    }
+
     def Object getStack(String id) {
         log.debug("Getting template...")
         return getOne(Resource.STACKS, id)
+    }
+
+    def Object getCluster(String id) {
+        log.debug("Getting cluster...")
+        return getOne(Resource.CLUSTERS, id)
     }
 
     def Object getCredential(String id) {

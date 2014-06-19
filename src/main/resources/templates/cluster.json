@@ -1,4 +1,5 @@
 {
    "clusterName":"$CLUSTER_NAME",
-   "blueprintId":$BLUEPRINT_ID
+   "blueprintId":$BLUEPRINT_ID,
+   "description":"$DESCRIPTION"
 }
