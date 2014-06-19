@@ -117,7 +117,7 @@ class CloudbreakClient {
     }
 
     def void addDefaultTemplates() throws HttpResponseException {
-        postEc2Template("Aws development environment",
+        postEc2Template("DefaultAwsTemplate",
                 "my default aws template",
                 "EU_WEST_1",
                 "ami-f39f5684",
