@@ -76,10 +76,18 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postEc2Credential(String platform, String name, String description, String roleArn, String instanceProfileRoleArn) {
+    def String postEc2Credential(String name, String description, String roleArn, String instanceProfileRoleArn) {
         log.debug("Posting credential ...")
-        def binding = ["CLOUD_PLATFORM": platform, "NAME": name, "DESCRIPTION": description, "ROLE_ARN": roleArn, "INSTANCE_PROFILE_ROLE_ARN": instanceProfileRoleArn]
+        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "DESCRIPTION": description, "ROLE_ARN": roleArn, "INSTANCE_PROFILE_ROLE_ARN": instanceProfileRoleArn]
         def response = processPost(Resource.CREDENTIALS, binding)
+        log.debug("Got response: {}", response.data.id)
+        return response?.data?.id
+    }
+
+    def String postEc2Template(String name, String description, String region, String amiId, String keyName, String sshLocation, String instanceType) {
+        log.debug("Posting credential ...")
+        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "DESCRIPTION": description, "REGION": region, "AMI": amiId, "KEYNAME": keyName, "SSH_LOCATION":sshLocation, "INSTANCE_TYPE":instanceType]
+        def response = processPost(Resource.TEMPLATES, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
@@ -101,7 +109,22 @@ class CloudbreakClient {
     }
 
     def void addDefaultCredentials() throws HttpResponseException {
-        postEc2Credential("AWS", "default aws", "my default aws credential", "arn:aws:iam::******:role/seq-self-cf", "arn:aws:iam::****:instance-profile/readonly-role")
+        postEc2Credential("default aws",
+                "my default aws credential",
+                "arn:aws:iam::******:role/seq-self-cf",
+                "arn:aws:iam::****:instance-profile/readonly-role"
+        )
+    }
+
+    def void addDefaultTemplates() throws HttpResponseException {
+        postEc2Template("Aws development environment",
+                "my default aws template",
+                "EU_WEST_1",
+                "ami-f39f5684",
+                "sequence-eu",
+                "0.0.0.0/0",
+                "M1Small"
+        )
     }
 
     def boolean health() {
