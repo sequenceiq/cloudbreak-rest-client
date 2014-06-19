@@ -84,8 +84,8 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postEc2Template(String name, String description, String region, String amiId, String keyName, String sshLocation, String instanceType) {
-        log.debug("Posting credential ...")
+    def String tStatEc2Template(String name, String description, String region, String amiId, String keyName, String sshLocation, String instanceType) {
+        log.debug("testing credential ...")
         def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "DESCRIPTION": description, "REGION": region, "AMI": amiId, "KEYNAME": keyName, "SSH_LOCATION":sshLocation, "INSTANCE_TYPE":instanceType]
         def response = processPost(Resource.TEMPLATES, binding)
         log.debug("Got response: {}", response.data.id)
@@ -140,7 +140,7 @@ class CloudbreakClient {
     }
 
     def Map<String, String> getCredentialsMap() {
-        def result = getCredentials().collectEntries {
+        def result = getCredentials()?.collectEntries {
             [(it.id as String): it.name + ":" + it.cloudPlatform]
         }
         result ?: new HashMap()
@@ -152,28 +152,28 @@ class CloudbreakClient {
     }
 
     def Map<String, String> getBlueprintsMap() {
-        def result = getBlueprints().collectEntries {
+        def result = getBlueprints()?.collectEntries {
             [(it.id as String): it.name + ":" + it.blueprintName]
         }
         result ?: new HashMap()
     }
 
     def Map<String, String> getTemplatesMap() {
-        def result = getTemplates().collectEntries {
+        def result = getTemplates()?.collectEntries {
             [(it.id as String): it.name + ":" + it.description]
         }
         result ?: new HashMap()
     }
 
     def Map<String, String> getStacksMap() {
-        def result = getStacks().collectEntries {
+        def result = getStacks()?.collectEntries {
             [(it.id as String): it.name + ":" + it.nodeCount]
         }
         result ?: new HashMap()
     }
 
     def Map<String, String> getClustersMap() {
-        def result = getClusters().collectEntries {
+        def result = getClusters()?.collectEntries {
             [(it.id as String): it.cluster + ":" + it.status]
         }
         result ?: new HashMap()
@@ -191,7 +191,7 @@ class CloudbreakClient {
 
     def List<Map> getClusters() {
         log.debug("Getting clusters...")
-        getAllAsList(Resource.CLUSTERS, id)
+        getAllAsList(Resource.CLUSTERS)
     }
 
     def Object getStack(String id) {

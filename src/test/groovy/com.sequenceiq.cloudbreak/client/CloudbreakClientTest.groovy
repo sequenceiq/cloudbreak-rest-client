@@ -67,4 +67,11 @@ class CloudbreakClientTest extends Specification {
         Object resp = cloudbreakClient.getStacksMap()
         log.debug("RESP: {}", resp)
     }
+
+    def "test get clusters as map"() {
+        expect:
+        Object resp = cloudbreakClient.getClustersMap()
+        log.debug("RESP: {}", resp)
+    }
+
 }
