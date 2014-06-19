@@ -96,14 +96,47 @@ class CloudbreakClient {
         getAllAsList(Resource.CREDENTIALS)
     }
 
+    def Map<String, String> getCredentialsMap() {
+        def result = getCredentials().collectEntries {
+            [(it.id): it.name + ":" + it.cloudPlatform]
+        }
+        result ?: new HashMap()
+    }
+
     def List<Map> getBlueprints() {
         log.debug("Getting blueprints...")
         getAllAsList(Resource.BLUEPRINTS)
     }
 
+    def Map<String, String> getBlueprintsMap() {
+        def result = getBlueprints().collectEntries {
+            [(it.id): it.name + ":" + it.blueprintName]
+        }
+        result ?: new HashMap()
+    }
+
+    def Map<String, String> getTemplatesMap() {
+        def result = getTemplates().collectEntries {
+            [(it.id): it.name + ":" + it.description]
+        }
+        result ?: new HashMap()
+    }
+
+    def Map<String, String> getStacksMap() {
+        def result = getStacks().collectEntries {
+            [(it.id): it.name + ":" + it.nodeCount]
+        }
+        result ?: new HashMap()
+    }
+
     def List<Map> getTemplates() {
         log.debug("Getting templates...")
         getAllAsList(Resource.TEMPLATES)
+    }
+
+    def List<Map> getStacks() {
+        log.debug("Getting templates...")
+        getAllAsList(Resource.STACKS)
     }
 
     def Object getCredential(String id) {

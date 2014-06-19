@@ -1,6 +1,6 @@
 {
    "nodeCount":$NODE_COUNT,
-   "templateId":"52",
+   "templateId":$TEMPLATE_ID,
    "name":"$STACK_NAME",
-   "credentialId":"52"
+   "credentialId":$CREDENTIAL_ID
 }
