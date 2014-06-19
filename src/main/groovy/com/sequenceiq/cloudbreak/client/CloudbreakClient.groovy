@@ -76,6 +76,14 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
+    def String postEc2Credential(String platform, String name, String description, String roleArn, String instanceProfileRoleArn) {
+        log.debug("Posting credential ...")
+        def binding = ["CLOUD_PLATFORM": platform, "NAME": name, "DESCRIPTION": description, "ROLE_ARN": roleArn, "INSTANCE_PROFILE_ROLE_ARN": instanceProfileRoleArn]
+        def response = processPost(Resource.CREDENTIALS, binding)
+        log.debug("Got response: {}", response.data.id)
+        return response?.data?.id
+    }
+
     def void postCluster(String clusterName, Integer blueprintId, Integer stackId) {
         log.debug("Posting cluster ...")
         def binding = ["CLUSTER_NAME": clusterName, "BLUEPRINT_ID": blueprintId]
@@ -90,6 +98,10 @@ class CloudbreakClient {
         postBlueprint("single-node-hdfs-yarn", "single-node-hdfs-yarn", getResourceContent("blueprints/single-node-hdfs-yarn"))
         postBlueprint("lambda-architecture", "lambda-architecture", getResourceContent("blueprints/lambda-architecture"))
         postBlueprint("warmup", "warmup", getResourceContent("blueprints/warmup"))
+    }
+
+    def void addDefaultCredentials() throws HttpResponseException {
+        postEc2Credential("AWS", "default aws", "my default aws credential", "arn:aws:iam::******:role/seq-self-cf", "arn:aws:iam::****:instance-profile/readonly-role")
     }
 
     def boolean health() {
