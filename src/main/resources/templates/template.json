@@ -1,11 +1,12 @@
 {
-   "cloudPlatform":"AWS",
+   "cloudPlatform":"$CLOUD_PLATFORM",
    "name":"$NAME",
+   "description":"$DESCRIPTION",
    "parameters":{
-      "region":"EU_WEST_1",
-      "amiId":"ami-f39f5684",
-      "keyName":"sequence-eu",
-      "sshLocation":"0.0.0.0/0",
-      "instanceType":"M1Small"
+      "region":"$REGION",
+      "amiId":"$AMI",
+      "keyName":"$KEYNAME",
+      "sshLocation":"$SSH_LOCATION",
+      "instanceType":"$INSTANCE_TYPE"
    }
 }

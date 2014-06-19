@@ -1,3 +1,5 @@
 {
-    "ambariBlueprint" : $BLUEPRINT
+    "ambariBlueprint" : $BLUEPRINT,
+    "name" : "$NAME",
+    "description": "$DESCRIPTION"
 }
