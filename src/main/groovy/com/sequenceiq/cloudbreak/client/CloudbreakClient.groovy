@@ -5,6 +5,7 @@ import groovy.text.SimpleTemplateEngine
 import groovy.text.TemplateEngine
 import groovy.util.logging.Slf4j
 import groovyx.net.http.ContentType
+import groovyx.net.http.HttpResponseException
 import groovyx.net.http.RESTClient
 
 @Slf4j
@@ -67,9 +68,9 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postBlueprint(String blueprint) {
+    def String postBlueprint(String name, String description, String blueprint) {
         log.debug("Posting blueprint ...")
-        def binding = ["BLUEPRINT": blueprint]
+        def binding = ["BLUEPRINT": blueprint, "NAME": name, "DESCRIPTION": description]
         def response = processPost(Resource.BLUEPRINTS, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
@@ -82,6 +83,13 @@ class CloudbreakClient {
         String path = Resource.CLUSTERS.path().replaceFirst("stack-id", stackId.toString())
         def Map postCtx = createPostRequestContext(path, ['json': json])
         def response = doPost(postCtx)
+    }
+
+    def void addDefaultBlueprints() throws HttpResponseException {
+        postBlueprint("multi-node-hdfs-yarn", "multi-node-hdfs-yarn",getResourceContent("blueprints/multi-node-hdfs-yarn"))
+        postBlueprint("single-node-hdfs-yarn", "single-node-hdfs-yarn", getResourceContent("blueprints/single-node-hdfs-yarn"))
+        postBlueprint("lambda-architecture", "lambda-architecture", getResourceContent("blueprints/lambda-architecture"))
+        postBlueprint("warmup", "warmup", getResourceContent("blueprints/warmup"))
     }
 
     def boolean health() {
@@ -213,6 +221,10 @@ class CloudbreakClient {
         def json = createJson(resource.template(), binding)
         def Map postCtx = createPostRequestContext(resource.path(), ['json': json])
         return doPost(postCtx)
+    }
+
+    private String getResourceContent(name) {
+        getClass().getClassLoader().getResourceAsStream(name)?.text
     }
 }
 
