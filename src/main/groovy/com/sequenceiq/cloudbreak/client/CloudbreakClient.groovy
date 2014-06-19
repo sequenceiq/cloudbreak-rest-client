@@ -182,6 +182,11 @@ class CloudbreakClient {
         getAllAsList(Resource.STACKS)
     }
 
+    def Object getStack(String id) {
+        log.debug("Getting template...")
+        return getOne(Resource.STACKS, id)
+    }
+
     def Object getCredential(String id) {
         log.debug("Getting credentials...")
         return getOne(Resource.CREDENTIALS, id)
