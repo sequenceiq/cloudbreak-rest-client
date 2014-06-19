@@ -98,7 +98,7 @@ class CloudbreakClient {
 
     def Map<String, String> getCredentialsMap() {
         def result = getCredentials().collectEntries {
-            [(it.id): it.name + ":" + it.cloudPlatform]
+            [(it.id as String): it.name + ":" + it.cloudPlatform]
         }
         result ?: new HashMap()
     }
@@ -110,21 +110,21 @@ class CloudbreakClient {
 
     def Map<String, String> getBlueprintsMap() {
         def result = getBlueprints().collectEntries {
-            [(it.id): it.name + ":" + it.blueprintName]
+            [(it.id as String): it.name + ":" + it.blueprintName]
         }
         result ?: new HashMap()
     }
 
     def Map<String, String> getTemplatesMap() {
         def result = getTemplates().collectEntries {
-            [(it.id): it.name + ":" + it.description]
+            [(it.id as String): it.name + ":" + it.description]
         }
         result ?: new HashMap()
     }
 
     def Map<String, String> getStacksMap() {
         def result = getStacks().collectEntries {
-            [(it.id): it.name + ":" + it.nodeCount]
+            [(it.id as String): it.name + ":" + it.nodeCount]
         }
         result ?: new HashMap()
     }
