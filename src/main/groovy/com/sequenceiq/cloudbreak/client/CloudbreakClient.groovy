@@ -287,6 +287,11 @@ class CloudbreakClient {
         return getOne(Resource.BLUEPRINTS, id)
     }
 
+    def Object terminateStack(String id) {
+        log.debug("Terminate stack...")
+        return deleteOne(Resource.STACKS, id)
+    }
+
     def private List getAllAsList(Resource resource) {
         Map getCtx = createGetRequestContext(resource.path(), [:]);
         Object response = doGet(getCtx);
@@ -300,10 +305,27 @@ class CloudbreakClient {
         return response?.data
     }
 
+    def private Object deleteOne(Resource resource, String id) {
+        String path = resource.path() + "/$id"
+        Map getCtx = createGetRequestContext(path, [:]);
+        Object response = doDelete(getCtx)
+        return response?.data
+    }
+
     def private Object doGet(Map getCtx) {
         Object response = null;
         try {
             response = restClient.get(getCtx)
+        } catch (e) {
+            log.error("ERROR: {}", e)
+        }
+        return response;
+    }
+
+    def private Object doDelete(Map getCtx) {
+        Object response = null;
+        try {
+            response = restClient.delete(getCtx)
         } catch (e) {
             log.error("ERROR: {}", e)
         }
