@@ -171,7 +171,7 @@ class CloudbreakClient {
         result ?: new HashMap()
     }
 
-    def Map<String, String> getBlueprintMap(String id) {
+    def Map<String, Object> getBlueprintMap(String id) {
         def result = getBlueprint(id)?.collectEntries {
             if (it.key == "parameters") {
                 it.value.collectEntries {
@@ -179,7 +179,7 @@ class CloudbreakClient {
                 }
             } else if (it.key == "ambariBlueprint") {
                 def result = it.value.host_groups?.collectEntries { [(it.name): it.components.collect { it.name }] }
-                [(it.key as String): result as String]
+                [(it.key as String): result as Map]
             } else {
                 [(it.key as String): it.value as String]
             }
