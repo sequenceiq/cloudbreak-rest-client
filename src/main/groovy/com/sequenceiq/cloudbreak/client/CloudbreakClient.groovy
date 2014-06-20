@@ -86,7 +86,7 @@ class CloudbreakClient {
 
     def String postEc2Template(String name, String description, String region, String amiId, String keyName, String sshLocation, String instanceType) {
         log.debug("testing credential ...")
-        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "DESCRIPTION": description, "REGION": region, "AMI": amiId, "KEYNAME": keyName, "SSH_LOCATION":sshLocation, "INSTANCE_TYPE":instanceType]
+        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "DESCRIPTION": description, "REGION": region, "AMI": amiId, "KEYNAME": keyName, "SSH_LOCATION": sshLocation, "INSTANCE_TYPE": instanceType]
         def response = processPost(Resource.TEMPLATES, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
@@ -102,7 +102,7 @@ class CloudbreakClient {
     }
 
     def void addDefaultBlueprints() throws HttpResponseException {
-        postBlueprint("multi-node-hdfs-yarn", "multi-node-hdfs-yarn",getResourceContent("blueprints/multi-node-hdfs-yarn"))
+        postBlueprint("multi-node-hdfs-yarn", "multi-node-hdfs-yarn", getResourceContent("blueprints/multi-node-hdfs-yarn"))
         postBlueprint("single-node-hdfs-yarn", "single-node-hdfs-yarn", getResourceContent("blueprints/single-node-hdfs-yarn"))
         postBlueprint("lambda-architecture", "lambda-architecture", getResourceContent("blueprints/lambda-architecture"))
         postBlueprint("warmup", "warmup", getResourceContent("blueprints/warmup"))
@@ -148,7 +148,7 @@ class CloudbreakClient {
 
     def Map<String, String> getCredentialMap(String id) {
         def result = getCredential(id)?.collectEntries {
-            if(it.key == "parameters") {
+            if (it.key == "parameters") {
                 it.value.collectEntries {
                     [(it.key as String): it.value as String]
                 }
@@ -173,10 +173,13 @@ class CloudbreakClient {
 
     def Map<String, String> getBlueprintMap(String id) {
         def result = getBlueprint(id)?.collectEntries {
-            if(it.key == "parameters") {
+            if (it.key == "parameters") {
                 it.value.collectEntries {
                     [(it.key as String): it.value as String]
                 }
+            } else if (it.key == "ambariBlueprint") {
+                def result = it.value.host_groups?.collectEntries { [(it.name): it.components.collect { it.name }] }
+                [(it.key as String): result as String]
             } else {
                 [(it.key as String): it.value as String]
             }
@@ -193,7 +196,7 @@ class CloudbreakClient {
 
     def Map<String, String> getTemplateMap(String id) {
         def result = getTemplate(id)?.collectEntries {
-            if(it.key == "parameters") {
+            if (it.key == "parameters") {
                 it.value.collectEntries {
                     [(it.key as String): it.value as String]
                 }
@@ -213,7 +216,7 @@ class CloudbreakClient {
 
     def Map<String, String> getStackMap(String id) {
         def result = getStack(id)?.collectEntries {
-            if(it.key == "parameters") {
+            if (it.key == "parameters") {
                 it.value.collectEntries {
                     [(it.key as String): it.value as String]
                 }
@@ -233,7 +236,7 @@ class CloudbreakClient {
 
     def Map<String, String> getClusterMap(String id) {
         def result = getCluster(id)?.collectEntries {
-            if(it.key == "parameters") {
+            if (it.key == "parameters") {
                 it.value.collectEntries {
                     [(it.key as String): it.value as String]
                 }
