@@ -146,6 +146,19 @@ class CloudbreakClient {
         result ?: new HashMap()
     }
 
+    def Map<String, String> getCredentialMap(String id) {
+        def result = getCredential(id)?.collectEntries {
+            if(it.key == "parameters") {
+                it.value.collectEntries {
+                    [(it.key as String): it.value as String]
+                }
+            } else {
+                [(it.key as String): it.value as String]
+            }
+        }
+        result ?: new HashMap()
+    }
+
     def List<Map> getBlueprints() {
         log.debug("Getting blueprints...")
         getAllAsList(Resource.BLUEPRINTS)
@@ -158,9 +171,35 @@ class CloudbreakClient {
         result ?: new HashMap()
     }
 
+    def Map<String, String> getBlueprintMap(String id) {
+        def result = getBlueprint(id)?.collectEntries {
+            if(it.key == "parameters") {
+                it.value.collectEntries {
+                    [(it.key as String): it.value as String]
+                }
+            } else {
+                [(it.key as String): it.value as String]
+            }
+        }
+        result ?: new HashMap()
+    }
+
     def Map<String, String> getTemplatesMap() {
         def result = getTemplates()?.collectEntries {
             [(it.id as String): it.name + ":" + it.description]
+        }
+        result ?: new HashMap()
+    }
+
+    def Map<String, String> getTemplateMap(String id) {
+        def result = getTemplate(id)?.collectEntries {
+            if(it.key == "parameters") {
+                it.value.collectEntries {
+                    [(it.key as String): it.value as String]
+                }
+            } else {
+                [(it.key as String): it.value as String]
+            }
         }
         result ?: new HashMap()
     }
@@ -172,9 +211,35 @@ class CloudbreakClient {
         result ?: new HashMap()
     }
 
+    def Map<String, String> getStackMap(String id) {
+        def result = getStack(id)?.collectEntries {
+            if(it.key == "parameters") {
+                it.value.collectEntries {
+                    [(it.key as String): it.value as String]
+                }
+            } else {
+                [(it.key as String): it.value as String]
+            }
+        }
+        result ?: new HashMap()
+    }
+
     def Map<String, String> getClustersMap() {
         def result = getClusters()?.collectEntries {
             [(it.id as String): it.cluster + ":" + it.status]
+        }
+        result ?: new HashMap()
+    }
+
+    def Map<String, String> getClusterMap(String id) {
+        def result = getCluster(id)?.collectEntries {
+            if(it.key == "parameters") {
+                it.value.collectEntries {
+                    [(it.key as String): it.value as String]
+                }
+            } else {
+                [(it.key as String): it.value as String]
+            }
         }
         result ?: new HashMap()
     }
