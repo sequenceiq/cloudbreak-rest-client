@@ -269,7 +269,8 @@ class CloudbreakClient {
 
     def Object getCluster(String id) {
         log.debug("Getting cluster...")
-        return getOne(Resource.CLUSTERS, id)
+        String path = Resource.CLUSTERS.path().replaceFirst("stack-id", id.toString())
+        return getOne(path)
     }
 
     def Object getCredential(String id) {
@@ -300,6 +301,13 @@ class CloudbreakClient {
 
     def private Object getOne(Resource resource, String id) {
         String path = resource.path() + "/$id"
+        Map getCtx = createGetRequestContext(path, [:]);
+        Object response = doGet(getCtx)
+        return response?.data
+    }
+
+    def private Object getOne(String resource) {
+        String path = resource
         Map getCtx = createGetRequestContext(path, [:]);
         Object response = doGet(getCtx)
         return response?.data
