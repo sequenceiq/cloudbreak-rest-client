@@ -12,11 +12,11 @@ import groovyx.net.http.RESTClient
 class CloudbreakClient {
 
     def private enum Resource {
-        CREDENTIALS("credential", "credentials.json"),
-        TEMPLATES("template", "template.json"),
-        STACKS("stack", "stack.json"),
-        BLUEPRINTS("blueprint", "blueprint.json"),
-        CLUSTERS("stack/stack-id/cluster", "cluster.json")
+        CREDENTIALS("credentials", "credentials.json"),
+        TEMPLATES("templates", "template.json"),
+        STACKS("stacks", "stack.json"),
+        BLUEPRINTS("blueprints", "blueprint.json"),
+        CLUSTERS("stacks/stack-id/cluster", "cluster.json")
         def path
         def template
 
