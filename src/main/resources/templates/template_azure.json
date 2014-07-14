@@ -5,7 +5,7 @@
    "parameters":{
        location: "$REGION",
        vmType: "$INSTANCE_TYPE",
-       imageName: "$INSTANCE_TYPE",
+       imageName: "$IMAGE_NAME",
        password: "$PASSWORD",
        sshPublicKey: "$SSHKEY",
        ports:[]

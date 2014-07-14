@@ -103,10 +103,10 @@ class CloudbreakClient {
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
-    
-    def String postAzureTemplate(String name, String description, String region, String instanceType, String sshKey, String password) {
+
+    def String postAzureTemplate(String name, String description, String region, String instanceName, String instanceType, String sshKey, String password) {
         log.debug("testing credential ...")
-        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "REGION": region, "INSTANCE_TYPE": instanceType, "PASSWORD": password, "SSHKEY": sshKey]
+        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "IMAGE_NAME": instanceName, "REGION": region, "INSTANCE_TYPE": instanceType, "PASSWORD": password, "SSHKEY": sshKey]
         def response = processPost(Resource.TEMPLATES_AZURE, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
