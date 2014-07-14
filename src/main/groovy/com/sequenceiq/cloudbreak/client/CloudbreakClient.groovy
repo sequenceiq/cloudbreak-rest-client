@@ -12,8 +12,12 @@ import groovyx.net.http.RESTClient
 class CloudbreakClient {
 
     def private enum Resource {
+        CREDENTIALS_EC2("credentials", "credentials_ec2.json"),
+        CREDENTIALS_AZURE("credentials", "credentials_azures.json"),
         CREDENTIALS("credentials", "credentials.json"),
         TEMPLATES("templates", "template.json"),
+        TEMPLATES_EC2("templates", "template_ec2.json"),
+        TEMPLATES_AZURE("templates", "template_azure.json"),
         STACKS("stacks", "stack.json"),
         BLUEPRINTS("blueprints", "blueprint.json"),
         CLUSTERS("stacks/stack-id/cluster", "cluster.json")
@@ -44,7 +48,7 @@ class CloudbreakClient {
         restClient.headers['Authorization'] = 'Basic ' + "$user:$password".getBytes('iso-8859-1').encodeBase64()
     }
 
-    def String postCredentials() {
+    def String postEc2Credentials() {
         log.debug("Posting credentials ...")
         def binding = [:]
         def response = processPost(Resource.CREDENTIALS, binding)
@@ -79,7 +83,15 @@ class CloudbreakClient {
     def String postEc2Credential(String name, String description, String roleArn) {
         log.debug("Posting credential ...")
         def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "ROLE_ARN": roleArn, "DESCRIPTION": description]
-        def response = processPost(Resource.CREDENTIALS, binding)
+        def response = processPost(Resource.CREDENTIALS_EC2, binding)
+        log.debug("Got response: {}", response.data.id)
+        return response?.data?.id
+    }
+
+    def String postAzureCredential(String name, String description, String subscriptionId, String jksPassword) {
+        log.debug("Posting credential ...")
+        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description,"SUBSCRIPTIONID": subscriptionId, "JKSPASSWORD": jksPassword]
+        def response = processPost(Resource.CREDENTIALS_AZURE, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
@@ -87,10 +99,19 @@ class CloudbreakClient {
     def String postEc2Template(String name, String description, String region, String amiId, String keyName, String sshLocation, String instanceType) {
         log.debug("testing credential ...")
         def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "REGION": region, "AMI": amiId, "KEYNAME": keyName, "SSH_LOCATION": sshLocation, "INSTANCE_TYPE": instanceType, "DESCRIPTION": description]
-        def response = processPost(Resource.TEMPLATES, binding)
+        def response = processPost(Resource.TEMPLATES_EC2, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
+    
+    def String postAzureTemplate(String name, String description, String region, String instanceType, String sshKey, String password) {
+        log.debug("testing credential ...")
+        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "REGION": region, "INSTANCE_TYPE": instanceType, "PASSWORD": password, "SSHKEY": sshKey]
+        def response = processPost(Resource.TEMPLATES_AZURE, binding)
+        log.debug("Got response: {}", response.data.id)
+        return response?.data?.id
+    }
+
 
     def void postCluster(String clusterName, Integer blueprintId, String descrition, Integer stackId) {
         log.debug("Posting cluster ...")

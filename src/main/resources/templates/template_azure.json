@@ -1,0 +1,13 @@
+{
+   "cloudPlatform":"$CLOUD_PLATFORM",
+   "name":"$NAME",
+   "description":"$DESCRIPTION",
+   "parameters":{
+       location: "$REGION",
+       vmType: "$INSTANCE_TYPE",
+       imageName: "$INSTANCE_TYPE",
+       password: "$PASSWORD",
+       sshPublicKey: "$SSHKEY",
+       ports:[]
+   }
+}
