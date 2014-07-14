@@ -76,9 +76,9 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postEc2Credential(String name, String description, String roleArn, String instanceProfileRoleArn) {
+    def String postEc2Credential(String name, String description, String roleArn) {
         log.debug("Posting credential ...")
-        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "DESCRIPTION": description, "ROLE_ARN": roleArn, "INSTANCE_PROFILE_ROLE_ARN": instanceProfileRoleArn]
+        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "DESCRIPTION": description, "ROLE_ARN": roleArn]
         def response = processPost(Resource.CREDENTIALS, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
@@ -111,8 +111,7 @@ class CloudbreakClient {
     def void addDefaultCredentials() throws HttpResponseException {
         postEc2Credential("default aws",
                 "my default aws credential",
-                "arn:aws:iam::******:role/seq-self-cf",
-                "arn:aws:iam::****:instance-profile/readonly-role"
+                "arn:aws:iam::******:role/seq-self-cf"
         )
     }
 
