@@ -60,9 +60,9 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postStack(String stackName, String nodeCount, String credentialId, String templateId) {
+    def String postStack(String stackName, String nodeCount, String credentialId, String templateId, String description) {
         log.debug("Posting stack ...")
-        def binding = ["NODE_COUNT": nodeCount, "STACK_NAME": stackName, "CREDENTIAL_ID": credentialId, "TEMPLATE_ID": templateId]
+        def binding = ["NODE_COUNT": nodeCount, "STACK_NAME": stackName, "CREDENTIAL_ID": credentialId, "TEMPLATE_ID": templateId, "DESCRIPTION": description]
         def response = processPost(Resource.STACKS, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
@@ -78,7 +78,7 @@ class CloudbreakClient {
 
     def String postEc2Credential(String name, String description, String roleArn) {
         log.debug("Posting credential ...")
-        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "DESCRIPTION": description, "ROLE_ARN": roleArn]
+        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "ROLE_ARN": roleArn, "DESCRIPTION": description]
         def response = processPost(Resource.CREDENTIALS, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
@@ -86,7 +86,7 @@ class CloudbreakClient {
 
     def String postEc2Template(String name, String description, String region, String amiId, String keyName, String sshLocation, String instanceType) {
         log.debug("testing credential ...")
-        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "DESCRIPTION": description, "REGION": region, "AMI": amiId, "KEYNAME": keyName, "SSH_LOCATION": sshLocation, "INSTANCE_TYPE": instanceType]
+        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "REGION": region, "AMI": amiId, "KEYNAME": keyName, "SSH_LOCATION": sshLocation, "INSTANCE_TYPE": instanceType, "DESCRIPTION": description]
         def response = processPost(Resource.TEMPLATES, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
