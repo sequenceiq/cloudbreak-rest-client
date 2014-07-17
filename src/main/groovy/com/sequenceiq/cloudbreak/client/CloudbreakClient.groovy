@@ -13,14 +13,16 @@ class CloudbreakClient {
 
     def private enum Resource {
         CREDENTIALS_EC2("credentials", "credentials_ec2.json"),
-        CREDENTIALS_AZURE("credentials", "credentials_azures.json"),
+        CREDENTIALS_AZURE("credentials", "credentials_azure.json"),
         CREDENTIALS("credentials", "credentials.json"),
         TEMPLATES("templates", "template.json"),
         TEMPLATES_EC2("templates", "template_ec2.json"),
         TEMPLATES_AZURE("templates", "template_azure.json"),
         STACKS("stacks", "stack.json"),
         BLUEPRINTS("blueprints", "blueprint.json"),
-        CLUSTERS("stacks/stack-id/cluster", "cluster.json")
+        CLUSTERS("stacks/stack-id/cluster", "cluster.json"),
+        CERTIFICATES("credentials/certificate", "certificate.json")
+
         def path
         def template
 
@@ -94,6 +96,10 @@ class CloudbreakClient {
         def response = processPost(Resource.CREDENTIALS_AZURE, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
+    }
+
+    def String getCertificate(String id) {
+        return getOne(Resource.CERTIFICATES, id).text
     }
 
     def String postEc2Template(String name, String description, String region, String amiId, String keyName, String sshLocation, String instanceType) {
