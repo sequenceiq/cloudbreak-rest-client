@@ -16,6 +16,13 @@ class CloudbreakClientTest extends Specification {
 
     }
 
+    def "test post azuretemplate"() {
+
+        expect:
+        Object resp = cloudbreakClient.postAzureTemplate("azuretempshell", "sdfsdfsd", "NORTH_EUROPE", "ambari-docker-v1", "MEDIUM", "sdfdsfsdfsdfsf", "")
+        log.debug("RESP: {}", resp)
+    }
+
     def "test post credentials"() {
 
         expect:
