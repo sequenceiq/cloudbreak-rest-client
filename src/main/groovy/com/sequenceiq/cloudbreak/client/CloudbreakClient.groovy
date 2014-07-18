@@ -289,8 +289,28 @@ class CloudbreakClient {
     }
 
     def Object getStack(String id) {
-        log.debug("Getting template...")
+        log.debug("Getting stack...")
         return getOne(Resource.STACKS, id)
+    }
+
+    def Object deleteStack(String id) {
+        log.debug("Delete stack...")
+        return deleteOne(Resource.STACKS, id)
+    }
+
+    def Object deleteTemplate(String id) {
+        log.debug("Delete template...")
+        return deleteOne(Resource.TEMPLATES, id)
+    }
+
+    def Object deleteCredential(String id) {
+        log.debug("Delete credential...")
+        return deleteOne(Resource.CREDENTIALS, id)
+    }
+
+    def Object deleteBlueprint(String id) {
+        log.debug("Delete blueprint...")
+        return deleteOne(Resource.BLUEPRINTS, id)
     }
 
     def Object getCluster(String id) {
