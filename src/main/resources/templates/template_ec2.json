@@ -5,7 +5,6 @@
     "parameters": {
         "region": "$REGION",
         "amiId": "$AMI",
-        "keyName": "$KEYNAME",
         "sshLocation": "$SSH_LOCATION",
         "instanceType": "$INSTANCE_TYPE"
     }

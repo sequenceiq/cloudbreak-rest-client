@@ -82,17 +82,17 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postEc2Credential(String name, String description, String roleArn) {
+    def String postEc2Credential(String name, String description, String roleArn, String sshKey) {
         log.debug("Posting credential ...")
-        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "ROLE_ARN": roleArn, "DESCRIPTION": description]
+        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "ROLE_ARN": roleArn, "DESCRIPTION": description, "SSHKEY": sshKey]
         def response = processPost(Resource.CREDENTIALS_EC2, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
 
-    def String postAzureCredential(String name, String description, String subscriptionId, String jksPassword) {
+    def String postAzureCredential(String name, String description, String subscriptionId, String jksPassword, String sshKey) {
         log.debug("Posting credential ...")
-        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description,"SUBSCRIPTIONID": subscriptionId, "JKSPASSWORD": jksPassword]
+        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description,"SUBSCRIPTIONID": subscriptionId, "JKSPASSWORD": jksPassword, "SSHKEY": sshKey]
         def response = processPost(Resource.CREDENTIALS_AZURE, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
@@ -102,17 +102,17 @@ class CloudbreakClient {
         return getOne(Resource.CERTIFICATES, id).text
     }
 
-    def String postEc2Template(String name, String description, String region, String amiId, String keyName, String sshLocation, String instanceType) {
+    def String postEc2Template(String name, String description, String region, String amiId, String sshLocation, String instanceType) {
         log.debug("testing credential ...")
-        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "REGION": region, "AMI": amiId, "KEYNAME": keyName, "SSH_LOCATION": sshLocation, "INSTANCE_TYPE": instanceType, "DESCRIPTION": description]
+        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "REGION": region, "AMI": amiId, "SSH_LOCATION": sshLocation, "INSTANCE_TYPE": instanceType, "DESCRIPTION": description]
         def response = processPost(Resource.TEMPLATES_EC2, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
 
-    def String postAzureTemplate(String name, String description, String region, String instanceName, String instanceType, String sshKey, String password) {
+    def String postAzureTemplate(String name, String description, String region, String instanceName, String instanceType) {
         log.debug("testing credential ...")
-        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "IMAGE_NAME": instanceName, "REGION": region, "INSTANCE_TYPE": instanceType, "PASSWORD": password, "SSHKEY": sshKey]
+        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "IMAGE_NAME": instanceName, "REGION": region, "INSTANCE_TYPE": instanceType]
         def response = processPost(Resource.TEMPLATES_AZURE, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
