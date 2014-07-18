@@ -5,7 +5,6 @@
     "parameters": {
         "location": "$REGION",
         "vmType": "$INSTANCE_TYPE",
-        "imageName": "$IMAGE_NAME",
-        "password": "$PASSWORD"
+        "imageName": "$IMAGE_NAME"
     }
 }
