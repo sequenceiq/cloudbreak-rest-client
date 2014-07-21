@@ -1,7 +1,6 @@
 Cloudbreak REST client
 ======================
 
-[![Build Status](http://ci.sequenceiq.com/buildStatus/icon?job=cloudbreak-rest-client)](http://ci.sequenceiq.com/job/cloudbreak-rest-client/)
 
 *Cloudbreak is a powerful left surf that breaks over a coral reef, a mile off southwest the island of Tavarua, Fiji.*
 
