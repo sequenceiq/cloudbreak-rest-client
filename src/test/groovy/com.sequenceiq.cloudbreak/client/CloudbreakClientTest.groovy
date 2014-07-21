@@ -6,7 +6,7 @@ import spock.lang.Specification
 @Slf4j
 class CloudbreakClientTest extends Specification {
 
-    def CloudbreakClient cloudbreakClient = new CloudbreakClient('localhost', '8080', 'cbuser@sequenceiq.com', 'test123');
+    def CloudbreakClient cloudbreakClient = new CloudbreakClient('localhost', '8080', 'cbuser@sequenceiq.com', 'test1235');
 
     def "test health check"() {
 
@@ -34,6 +34,14 @@ class CloudbreakClientTest extends Specification {
         expect:
         Object resp = cloudbreakClient.getCredentials()
         log.debug("RESP: {}", resp)
+    }
+
+    def "test get credential"() {
+        expect:
+        Object resp = cloudbreakClient.getCredential("50")
+        Object resp1 = cloudbreakClient.getCredentialMap("50")
+        log.debug("RESP: {}", resp)
+        log.debug("RESP1: {}", resp1)
     }
 
     def "test post blueprint"() {
@@ -78,6 +86,12 @@ class CloudbreakClientTest extends Specification {
     def "test get clusters as map"() {
         expect:
         Object resp = cloudbreakClient.getClustersMap()
+        log.debug("RESP: {}", resp)
+    }
+
+    def "test get login"() {
+        expect:
+        Object resp = cloudbreakClient.login()
         log.debug("RESP: {}", resp)
     }
 

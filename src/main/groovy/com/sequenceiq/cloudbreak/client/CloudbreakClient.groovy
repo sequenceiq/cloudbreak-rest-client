@@ -21,7 +21,8 @@ class CloudbreakClient {
         STACKS("stacks", "stack.json"),
         BLUEPRINTS("blueprints", "blueprint.json"),
         CLUSTERS("stacks/stack-id/cluster", "cluster.json"),
-        CERTIFICATES("credentials/certificate", "certificate.json")
+        CERTIFICATES("credentials/certificate", "certificate.json"),
+        ME("me", "me.json")
 
         def path
         def template
@@ -45,7 +46,7 @@ class CloudbreakClient {
     def slurper = new JsonSlurper()
 
 
-    CloudbreakClient(host = 'localhost', port = '8080', user = 'user@seq.com', password = 'test123') {
+    CloudbreakClient(host = 'localhost', port = '8080', user = 'cbuser@sequenceiq.com', password = 'test123') {
         restClient = new RESTClient("http://${host}:${port}/" as String)
         restClient.headers['Authorization'] = 'Basic ' + "$user:$password".getBytes('iso-8859-1').encodeBase64()
     }
@@ -158,6 +159,11 @@ class CloudbreakClient {
         Map getCtx = createGetRequestContext('health', null)
         Object healthObj = doGet(getCtx)
         return healthObj.data.status == 'ok'
+    }
+
+    def boolean login() {
+        log.debug("Getting login...")
+        return getNothing(Resource.ME).email != null
     }
 
     def List<Map> getCredentials() {
@@ -347,6 +353,13 @@ class CloudbreakClient {
 
     def private Object getOne(Resource resource, String id) {
         String path = resource.path() + "/$id"
+        Map getCtx = createGetRequestContext(path, [:]);
+        Object response = doGet(getCtx)
+        return response?.data
+    }
+
+    def private Object getNothing(Resource resource) {
+        String path = resource.path()
         Map getCtx = createGetRequestContext(path, [:]);
         Object response = doGet(getCtx)
         return response?.data
