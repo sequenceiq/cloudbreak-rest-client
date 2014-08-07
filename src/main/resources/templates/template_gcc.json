@@ -1,0 +1,11 @@
+{
+    "cloudPlatform": "$CLOUD_PLATFORM",
+    "name": "$NAME",
+    "description": "$DESCRIPTION",
+    "parameters": {
+        "region": "$REGION",
+        "amiId": "$AMI",
+        "sshLocation": "$SSH_LOCATION",
+        "instanceType": "$INSTANCE_TYPE"
+    }
+}
