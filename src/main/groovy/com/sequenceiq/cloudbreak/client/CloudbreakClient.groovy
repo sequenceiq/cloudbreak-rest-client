@@ -51,23 +51,7 @@ class CloudbreakClient {
         restClient.headers['Authorization'] = 'Basic ' + "$user:$password".getBytes('iso-8859-1').encodeBase64()
     }
 
-    def String postEc2Credentials() {
-        log.debug("Posting credentials ...")
-        def binding = [:]
-        def response = processPost(Resource.CREDENTIALS, binding)
-        log.debug("Got response: {}", response.data.id)
-        return response?.data?.id
-    }
-
-    def String postTemplate(String name) {
-        log.debug("Posting template ...")
-        def binding = ["NAME": "$name"]
-        def response = processPost(Resource.TEMPLATES, binding)
-        log.debug("Got response: {}", response.data.id)
-        return response?.data?.id
-    }
-
-    def String postStack(String stackName, String nodeCount, String credentialId, String templateId) {
+    def String postStack(String stackName, String nodeCount, String credentialId, String templateId) throws Exception {
         log.debug("Posting stack ...")
         def binding = ["NODE_COUNT": nodeCount, "STACK_NAME": stackName, "CREDENTIAL_ID": credentialId, "TEMPLATE_ID": templateId]
         def response = processPost(Resource.STACKS, binding)
@@ -75,7 +59,7 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postBlueprint(String name, String description, String blueprint) {
+    def String postBlueprint(String name, String description, String blueprint) throws Exception {
         log.debug("Posting blueprint ...")
         def binding = ["BLUEPRINT": blueprint, "NAME": name, "DESCRIPTION": description]
         def response = processPost(Resource.BLUEPRINTS, binding)
@@ -83,15 +67,14 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postEc2Credential(String name, String description, String roleArn, String sshKey) {
+    def String postEc2Credential(String name, String description, String roleArn, String sshKey) throws Exception {
         log.debug("Posting credential ...")
         def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "ROLE_ARN": roleArn, "DESCRIPTION": description, "SSHKEY": sshKey]
-        def response = processPost(Resource.CREDENTIALS_EC2, binding)
-        log.debug("Got response: {}", response.data.id)
+        def response  = processPost(Resource.CREDENTIALS_EC2, binding)
         return response?.data?.id
     }
 
-    def String postAzureCredential(String name, String description, String subscriptionId, String jksPassword, String sshKey) {
+    def String postAzureCredential(String name, String description, String subscriptionId, String jksPassword, String sshKey) throws Exception {
         log.debug("Posting credential ...")
         def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description,"SUBSCRIPTIONID": subscriptionId, "JKSPASSWORD": jksPassword, "SSHKEY": sshKey]
         def response = processPost(Resource.CREDENTIALS_AZURE, binding)
@@ -99,11 +82,11 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String getCertificate(String id) {
+    def String getCertificate(String id) throws Exception {
         return getOne(Resource.CERTIFICATES, id).text
     }
 
-    def String postEc2Template(String name, String description, String region, String amiId, String sshLocation, String instanceType) {
+    def String postEc2Template(String name, String description, String region, String amiId, String sshLocation, String instanceType) throws Exception {
         log.debug("testing credential ...")
         def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "REGION": region, "AMI": amiId, "SSH_LOCATION": sshLocation, "INSTANCE_TYPE": instanceType, "DESCRIPTION": description]
         def response = processPost(Resource.TEMPLATES_EC2, binding)
@@ -111,7 +94,7 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postAzureTemplate(String name, String description, String region, String instanceName, String instanceType) {
+    def String postAzureTemplate(String name, String description, String region, String instanceName, String instanceType) throws Exception {
         log.debug("testing credential ...")
         def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "IMAGE_NAME": instanceName, "REGION": region, "INSTANCE_TYPE": instanceType]
         def response = processPost(Resource.TEMPLATES_AZURE, binding)
@@ -120,7 +103,7 @@ class CloudbreakClient {
     }
 
 
-    def void postCluster(String clusterName, Integer blueprintId, String descrition, Integer stackId) {
+    def void postCluster(String clusterName, Integer blueprintId, String descrition, Integer stackId) throws Exception {
         log.debug("Posting cluster ...")
         def binding = ["CLUSTER_NAME": clusterName, "BLUEPRINT_ID": blueprintId, "DESCRIPTION": descrition]
         def json = createJson(Resource.CLUSTERS.template(), binding)
@@ -136,49 +119,31 @@ class CloudbreakClient {
         postBlueprint("warmup", "warmup", getResourceContent("blueprints/warmup"))
     }
 
-    def void addDefaultCredentials() throws HttpResponseException {
-        postEc2Credential("default aws",
-                "my default aws credential",
-                "arn:aws:iam::******:role/seq-self-cf"
-        )
-    }
-
-    def void addDefaultTemplates() throws HttpResponseException {
-        postEc2Template("DefaultAwsTemplate",
-                "my default aws template",
-                "EU_WEST_1",
-                "ami-f39f5684",
-                "sequence-eu",
-                "0.0.0.0/0",
-                "M1Small"
-        )
-    }
-
-    def boolean health() {
+    def boolean health() throws Exception {
         log.debug("Checking health ...")
         Map getCtx = createGetRequestContext('health', null)
         Object healthObj = doGet(getCtx)
         return healthObj.data.status == 'ok'
     }
 
-    def boolean login() {
+    def boolean login() throws Exception {
         log.debug("Getting login...")
         return getNothing(Resource.ME).email != null
     }
 
-    def List<Map> getCredentials() {
+    def List<Map> getCredentials() throws Exception {
         log.debug("Getting credentials...")
         getAllAsList(Resource.CREDENTIALS)
     }
 
-    def Map<String, String> getCredentialsMap() {
+    def Map<String, String> getCredentialsMap() throws Exception {
         def result = getCredentials()?.collectEntries {
             [(it.id as String): it.name + ":" + it.cloudPlatform]
         }
         result ?: new HashMap()
     }
 
-    def Map<String, String> getCredentialMap(String id) {
+    def Map<String, String> getCredentialMap(String id) throws Exception {
         def result = getCredential(id)?.collectEntries {
             if (it.key == "parameters") {
                 it.value.collectEntries {
@@ -191,19 +156,19 @@ class CloudbreakClient {
         result ?: new HashMap()
     }
 
-    def List<Map> getBlueprints() {
+    def List<Map> getBlueprints() throws Exception {
         log.debug("Getting blueprints...")
         getAllAsList(Resource.BLUEPRINTS)
     }
 
-    def Map<String, String> getBlueprintsMap() {
+    def Map<String, String> getBlueprintsMap() throws Exception {
         def result = getBlueprints()?.collectEntries {
             [(it.id as String): it.name + ":" + it.blueprintName]
         }
         result ?: new HashMap()
     }
 
-    def Map<String, Object> getBlueprintMap(String id) {
+    def Map<String, Object> getBlueprintMap(String id) throws Exception {
         def result = getBlueprint(id)?.collectEntries {
             if (it.key == "parameters") {
                 it.value.collectEntries {
@@ -219,14 +184,14 @@ class CloudbreakClient {
         result ?: new HashMap()
     }
 
-    def Map<String, String> getTemplatesMap() {
+    def Map<String, String> getTemplatesMap() throws Exception {
         def result = getTemplates()?.collectEntries {
             [(it.id as String): it.name + ":" + it.description]
         }
         result ?: new HashMap()
     }
 
-    def Map<String, String> getTemplateMap(String id) {
+    def Map<String, String> getTemplateMap(String id) throws Exception {
         def result = getTemplate(id)?.collectEntries {
             if (it.key == "parameters") {
                 it.value.collectEntries {
@@ -239,14 +204,14 @@ class CloudbreakClient {
         result ?: new HashMap()
     }
 
-    def Map<String, String> getStacksMap() {
+    def Map<String, String> getStacksMap() throws Exception {
         def result = getStacks()?.collectEntries {
             [(it.id as String): it.name + ":" + it.nodeCount]
         }
         result ?: new HashMap()
     }
 
-    def Map<String, String> getStackMap(String id) {
+    def Map<String, String> getStackMap(String id) throws Exception {
         def result = getStack(id)?.collectEntries {
             if (it.key == "parameters") {
                 it.value.collectEntries {
@@ -259,14 +224,14 @@ class CloudbreakClient {
         result ?: new HashMap()
     }
 
-    def Map<String, String> getClustersMap() {
+    def Map<String, String> getClustersMap() throws Exception {
         def result = getClusters()?.collectEntries {
             [(it.id as String): it.cluster + ":" + it.status]
         }
         result ?: new HashMap()
     }
 
-    def Map<String, String> getClusterMap(String id) {
+    def Map<String, String> getClusterMap(String id) throws Exception {
         def result = getCluster(id)?.collectEntries {
             if (it.key == "parameters") {
                 it.value.collectEntries {
@@ -279,144 +244,137 @@ class CloudbreakClient {
         result ?: new HashMap()
     }
 
-    def List<Map> getTemplates() {
+    def List<Map> getTemplates() throws Exception {
         log.debug("Getting templates...")
         getAllAsList(Resource.TEMPLATES)
     }
 
-    def List<Map> getStacks() {
+    def List<Map> getStacks() throws Exception {
         log.debug("Getting templates...")
         getAllAsList(Resource.STACKS)
     }
 
-    def List<Map> getClusters() {
+    def List<Map> getClusters() throws Exception {
         log.debug("Getting clusters...")
         getAllAsList(Resource.CLUSTERS)
     }
 
-    def Object getStack(String id) {
+    def Object getStack(String id) throws Exception {
         log.debug("Getting stack...")
         return getOne(Resource.STACKS, id)
     }
 
-    def Object deleteStack(String id) {
+    def Object deleteStack(String id) throws Exception {
         log.debug("Delete stack...")
         return deleteOne(Resource.STACKS, id)
     }
 
-    def Object deleteTemplate(String id) {
+    def Object deleteTemplate(String id) throws Exception {
         log.debug("Delete template...")
         return deleteOne(Resource.TEMPLATES, id)
     }
 
-    def Object deleteCredential(String id) {
+    def Object deleteCredential(String id) throws Exception {
         log.debug("Delete credential...")
         return deleteOne(Resource.CREDENTIALS, id)
     }
 
-    def Object deleteBlueprint(String id) {
+    def Object deleteBlueprint(String id) throws Exception {
         log.debug("Delete blueprint...")
         return deleteOne(Resource.BLUEPRINTS, id)
     }
 
-    def Object getCluster(String id) {
+    def Object getCluster(String id) throws Exception {
         log.debug("Getting cluster...")
         String path = Resource.CLUSTERS.path().replaceFirst("stack-id", id.toString())
         return getOne(path)
     }
 
-    def Object getCredential(String id) {
+    def Object getCredential(String id) throws Exception {
         log.debug("Getting credentials...")
         return getOne(Resource.CREDENTIALS, id)
     }
 
-    def Object getTemplate(String id) {
+    def Object getTemplate(String id) throws Exception {
         log.debug("Getting credentials...")
         return getOne(Resource.TEMPLATES, id)
     }
 
-    def Object getBlueprint(String id) {
+    def Object getBlueprint(String id) throws Exception {
         log.debug("Getting credentials...")
         return getOne(Resource.BLUEPRINTS, id)
     }
 
-    def Object terminateStack(String id) {
+    def Object terminateStack(String id) throws Exception {
         log.debug("Terminate stack...")
         return deleteOne(Resource.STACKS, id)
     }
 
-    def private List getAllAsList(Resource resource) {
+    def private List getAllAsList(Resource resource) throws Exception {
         Map getCtx = createGetRequestContext(resource.path(), [:]);
         Object response = doGet(getCtx);
         return response?.data
     }
 
-    def private Object getOne(Resource resource, String id) {
+    def private Object getOne(Resource resource, String id) throws Exception {
         String path = resource.path() + "/$id"
         Map getCtx = createGetRequestContext(path, [:]);
         Object response = doGet(getCtx)
         return response?.data
     }
 
-    def private Object getNothing(Resource resource) {
+    def private Object getNothing(Resource resource) throws Exception {
         String path = resource.path()
         Map getCtx = createGetRequestContext(path, [:]);
         Object response = doGet(getCtx)
         return response?.data
     }
 
-    def private Object getOne(String resource) {
+    def private Object getOne(String resource) throws Exception {
         String path = resource
         Map getCtx = createGetRequestContext(path, [:]);
         Object response = doGet(getCtx)
         return response?.data
     }
 
-    def private Object deleteOne(Resource resource, String id) {
+    def private Object deleteOne(Resource resource, String id) throws Exception {
         String path = resource.path() + "/$id"
         Map getCtx = createGetRequestContext(path, [:]);
         Object response = doDelete(getCtx)
         return response?.data
     }
 
-    def private Object doGet(Map getCtx) {
+    def private Object doGet(Map getCtx) throws Exception {
         Object response = null;
-        try {
-            response = restClient.get(getCtx)
-        } catch (e) {
-            log.error("ERROR: {}", e)
-        }
+        response = restClient.get(getCtx)
         return response;
     }
 
-    def private Object doDelete(Map getCtx) {
+    def private Object doDelete(Map getCtx) throws Exception {
         Object response = null;
-        try {
-            response = restClient.delete(getCtx)
-        } catch (e) {
-            log.error("ERROR: {}", e)
-        }
+        response = restClient.delete(getCtx)
         return response;
     }
 
-    def private Object doPost(Map postCtx) {
+    def private Object doPost(Map postCtx) throws Exception {
         Object response = null;
         try {
             response = restClient.post(postCtx)
         } catch (e) {
             log.error("ERROR: {}", e)
+            throw  e;
         }
         return response;
     }
 
-    def private Map createGetRequestContext(String resourcePath, Map ctx) {
+    def private Map createGetRequestContext(String resourcePath, Map ctx) throws Exception {
         Map context = [:]
         String uri = "${restClient.uri}$resourcePath"
         context.put('path', uri)
         return context
     }
 
-    def private Map createPostRequestContext(String resourcePath, Map ctx) {
+    def private Map createPostRequestContext(String resourcePath, Map ctx) throws Exception {
         def Map<String, ?> putRequestMap = [:]
         def String uri = "${restClient.uri}$resourcePath"
         putRequestMap.put('path', uri)
@@ -425,13 +383,13 @@ class CloudbreakClient {
         return putRequestMap
     }
 
-    def private String createJson(String templateName, Map bindings) {
+    def private String createJson(String templateName, Map bindings) throws Exception {
         def InputStream inPut = this.getClass().getClassLoader().getResourceAsStream("templates/${templateName}");
         String json = engine.createTemplate(new InputStreamReader(inPut)).make(bindings);
         return json;
     }
 
-    def private Object processPost(Resource resource, Map binding) {
+    def private Object processPost(Resource resource, Map binding) throws Exception {
         def json = createJson(resource.template(), binding)
         def Map postCtx = createPostRequestContext(resource.path(), ['json': json])
         return doPost(postCtx)
