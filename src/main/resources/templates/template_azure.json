@@ -2,6 +2,8 @@
     "cloudPlatform": "$CLOUD_PLATFORM",
     "name": "$NAME",
     "description": "$DESCRIPTION",
+    "volumeCount": "$VOLUME_COUNT",
+    "volumeSize": "$VOLUME_SIZE",
     "parameters": {
         "location": "$REGION",
         "vmType": "$INSTANCE_TYPE",

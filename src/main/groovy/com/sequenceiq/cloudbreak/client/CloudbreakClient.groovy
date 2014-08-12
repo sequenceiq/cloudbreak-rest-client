@@ -86,17 +86,17 @@ class CloudbreakClient {
         return getOne(Resource.CERTIFICATES, id).text
     }
 
-    def String postEc2Template(String name, String description, String region, String amiId, String sshLocation, String instanceType) throws Exception {
+    def String postEc2Template(String name, String description, String region, String amiId, String sshLocation, String instanceType, String volumeCount, String volumeSize, String volumeType, String spotPrice) throws Exception {
         log.debug("testing credential ...")
-        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "REGION": region, "AMI": amiId, "SSH_LOCATION": sshLocation, "INSTANCE_TYPE": instanceType, "DESCRIPTION": description]
+        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "REGION": region, "AMI": amiId, "SSH_LOCATION": sshLocation, "INSTANCE_TYPE": instanceType, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "VOLUME_TYPE": volumeType, "SPOT_PRICE": spotPrice]
         def response = processPost(Resource.TEMPLATES_EC2, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
 
-    def String postAzureTemplate(String name, String description, String region, String instanceName, String instanceType) throws Exception {
+    def String postAzureTemplate(String name, String description, String region, String instanceName, String instanceType, String volumeCount, String volumeSize) throws Exception {
         log.debug("testing credential ...")
-        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "IMAGE_NAME": instanceName, "REGION": region, "INSTANCE_TYPE": instanceType]
+        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "IMAGE_NAME": instanceName, "REGION": region, "INSTANCE_TYPE": instanceType, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize]
         def response = processPost(Resource.TEMPLATES_AZURE, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
