@@ -9,6 +9,7 @@
         "amiId": "$AMI",
         "sshLocation": "$SSH_LOCATION",
         "instanceType": "$INSTANCE_TYPE",
-        "volumeType": "$VOLUME_TYPE"
+        "volumeType": "$VOLUME_TYPE",
+        "spotPrice": "$SPOT_PRICE"
     }
 }

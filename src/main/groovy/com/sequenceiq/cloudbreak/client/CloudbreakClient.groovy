@@ -17,6 +17,7 @@ class CloudbreakClient {
         CREDENTIALS("credentials", "credentials.json"),
         TEMPLATES("templates", "template.json"),
         TEMPLATES_EC2("templates", "template_ec2.json"),
+        SPOT_TEMPLATES_EC2("templates", "template_spot_ec2.json"),
         TEMPLATES_AZURE("templates", "template_azure.json"),
         STACKS("stacks", "stack.json"),
         BLUEPRINTS("blueprints", "blueprint.json"),
@@ -86,9 +87,17 @@ class CloudbreakClient {
         return getOne(Resource.CERTIFICATES, id).text
     }
 
-    def String postEc2Template(String name, String description, String region, String amiId, String sshLocation, String instanceType, String volumeCount, String volumeSize, String volumeType, String spotPrice) throws Exception {
+    def String postSpotEc2Template(String name, String description, String region, String amiId, String sshLocation, String instanceType, String volumeCount, String volumeSize, String volumeType, String spotPrice) throws Exception {
         log.debug("testing credential ...")
         def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "REGION": region, "AMI": amiId, "SSH_LOCATION": sshLocation, "INSTANCE_TYPE": instanceType, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "VOLUME_TYPE": volumeType, "SPOT_PRICE": spotPrice]
+        def response = processPost(Resource.SPOT_TEMPLATES_EC2, binding)
+        log.debug("Got response: {}", response.data.id)
+        return response?.data?.id
+    }
+
+    def String postEc2Template(String name, String description, String region, String amiId, String sshLocation, String instanceType, String volumeCount, String volumeSize, String volumeType) throws Exception {
+        log.debug("testing credential ...")
+        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "REGION": region, "AMI": amiId, "SSH_LOCATION": sshLocation, "INSTANCE_TYPE": instanceType, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "VOLUME_TYPE": volumeType]
         def response = processPost(Resource.TEMPLATES_EC2, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
