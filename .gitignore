@@ -2,3 +2,5 @@
 *.iml
 target/
 atlassian*
+.gradle/
+build/
