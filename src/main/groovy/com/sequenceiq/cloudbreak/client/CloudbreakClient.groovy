@@ -20,6 +20,8 @@ class CloudbreakClient {
         SPOT_TEMPLATES_EC2("templates", "template_spot_ec2.json"),
         TEMPLATES_AZURE("templates", "template_azure.json"),
         STACKS("stacks", "stack.json"),
+        STACK_NODECOUNT_PUT("stacks", "stack_nodecount_put.json"),
+        CLUSTER_NODECOUNT_PUT("stacks/stack-id/cluster", "cluster_nodecount_put.json"),
         BLUEPRINTS("blueprints", "blueprint.json"),
         CLUSTERS("stacks/stack-id/cluster", "cluster.json"),
         CERTIFICATES("credentials/certificate", "certificate.json"),
@@ -111,6 +113,27 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
+    def void putCluster(String stackId, Map<String, Integer> hostgroupAssociations) throws Exception {
+        log.debug("Puting cluster ...")
+        StringBuilder hosts = new StringBuilder()
+        for (Map.Entry<String, Integer> entry : hostgroupAssociations.entrySet()) {
+            hosts.append(String.format("{\"%s\":%d},", entry.getKey(), entry.getValue()))
+        }
+        def binding = ["HOSTS": hosts.toString().substring(0, hosts.toString().length()-1)]
+        def json = createJson(Resource.CLUSTER_NODECOUNT_PUT.template(), binding)
+        String path = Resource.CLUSTER_NODECOUNT_PUT.path().replaceFirst("stack-id", stackId.toString())
+        def Map putCtx = createPostRequestContext(path, ['json': json])
+        def response = doPut(putCtx)
+    }
+
+    def void putStack(String id, Integer nodeCount) throws Exception {
+        log.debug("Puting stack ...")
+        def binding = ["NODE_COUNT": nodeCount]
+        def json = createJson(Resource.STACK_NODECOUNT_PUT.template(), binding)
+        String path = Resource.STACK_NODECOUNT_PUT.path() + "/$id"
+        def Map putCtx = createPostRequestContext(path, ['json': json])
+        def response = doPut(putCtx)
+    }
 
     def void postCluster(String clusterName, Integer blueprintId, String descrition, Integer stackId) throws Exception {
         log.debug("Posting cluster ...")
@@ -369,6 +392,17 @@ class CloudbreakClient {
         Object response = null;
         try {
             response = restClient.post(postCtx)
+        } catch (e) {
+            log.error("ERROR: {}", e)
+            throw  e;
+        }
+        return response;
+    }
+
+    def private Object doPut(Map putCtx) throws Exception {
+        Object response = null;
+        try {
+            response = restClient.put(putCtx)
         } catch (e) {
             log.error("ERROR: {}", e)
             throw  e;
