@@ -1,5 +1,6 @@
 package com.sequenceiq.cloudbreak.client
 
+import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import groovy.text.SimpleTemplateEngine
 import groovy.text.TemplateEngine
@@ -20,6 +21,8 @@ class CloudbreakClient {
         SPOT_TEMPLATES_EC2("templates", "template_spot_ec2.json"),
         TEMPLATES_AZURE("templates", "template_azure.json"),
         STACKS("stacks", "stack.json"),
+        STACK_NODECOUNT_PUT("stacks", "stack_nodecount_put.json"),
+        CLUSTER_NODECOUNT_PUT("stacks/stack-id/cluster", "cluster_nodecount_put.json"),
         BLUEPRINTS("blueprints", "blueprint.json"),
         CLUSTERS("stacks/stack-id/cluster", "cluster.json"),
         CERTIFICATES("credentials/certificate", "certificate.json"),
@@ -71,13 +74,13 @@ class CloudbreakClient {
     def String postEc2Credential(String name, String description, String roleArn, String sshKey) throws Exception {
         log.debug("Posting credential ...")
         def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "ROLE_ARN": roleArn, "DESCRIPTION": description, "SSHKEY": sshKey]
-        def response  = processPost(Resource.CREDENTIALS_EC2, binding)
+        def response = processPost(Resource.CREDENTIALS_EC2, binding)
         return response?.data?.id
     }
 
     def String postAzureCredential(String name, String description, String subscriptionId, String jksPassword, String sshKey) throws Exception {
         log.debug("Posting credential ...")
-        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description,"SUBSCRIPTIONID": subscriptionId, "JKSPASSWORD": jksPassword, "SSHKEY": sshKey]
+        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "SUBSCRIPTIONID": subscriptionId, "JKSPASSWORD": jksPassword, "SSHKEY": sshKey]
         def response = processPost(Resource.CREDENTIALS_AZURE, binding)
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
@@ -111,6 +114,41 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
+    def void putCluster(String ambari, Map<String, Integer> hostGroupAssociations) throws Exception {
+        def stackId = getStackId(ambari)
+        if (stackId) {
+            putCluster(stackId, hostGroupAssociations);
+        }
+    }
+
+    def void putCluster(int stackId, Map<String, Integer> hostGroupAssociations) throws Exception {
+        log.debug("Putting cluster ...")
+        def hostGroups = []
+        hostGroupAssociations.each {
+            hostGroups << ["hostGroup": it.key, "scalingAdjustment": it.value]
+        }
+        def binding = ["HOST_GROUPS": new JsonBuilder(hostGroups).toPrettyString()]
+        def json = createJson(Resource.CLUSTER_NODECOUNT_PUT.template(), binding)
+        String path = Resource.CLUSTER_NODECOUNT_PUT.path().replaceFirst("stack-id", stackId.toString())
+        def Map putCtx = createPostRequestContext(path, ['json': json])
+        doPut(putCtx)
+    }
+
+    def void putStack(String ambari, int scalingAdjustment) throws Exception {
+        def stackId = getStackId(ambari)
+        if (stackId) {
+            putStack(stackId, scalingAdjustment)
+        }
+    }
+
+    def void putStack(int id, int scalingAdjustment) throws Exception {
+        log.debug("Putting stack ...")
+        def binding = ["NODE_COUNT": scalingAdjustment]
+        def json = createJson(Resource.STACK_NODECOUNT_PUT.template(), binding)
+        String path = Resource.STACK_NODECOUNT_PUT.path() + "/$id"
+        def Map putCtx = createPostRequestContext(path, ['json': json])
+        doPut(putCtx)
+    }
 
     def void postCluster(String clusterName, Integer blueprintId, String descrition, Integer stackId) throws Exception {
         log.debug("Posting cluster ...")
@@ -371,7 +409,18 @@ class CloudbreakClient {
             response = restClient.post(postCtx)
         } catch (e) {
             log.error("ERROR: {}", e)
-            throw  e;
+            throw e;
+        }
+        return response;
+    }
+
+    def private Object doPut(Map putCtx) throws Exception {
+        Object response = null;
+        try {
+            response = restClient.put(putCtx)
+        } catch (e) {
+            log.error("ERROR: {}", e)
+            throw e;
         }
         return response;
     }
@@ -406,6 +455,10 @@ class CloudbreakClient {
 
     private String getResourceContent(name) {
         getClass().getClassLoader().getResourceAsStream(name)?.text
+    }
+
+    private int getStackId(String ambari) {
+        getStacks().find { it.ambariServerIp.equals(ambari) }?.id
     }
 }
 
