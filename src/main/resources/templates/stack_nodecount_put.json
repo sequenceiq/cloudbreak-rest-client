@@ -1,3 +1,3 @@
 {
-    "nodeCount":$NODE_COUNT
+    "scalingAdjustment":$NODE_COUNT
 }

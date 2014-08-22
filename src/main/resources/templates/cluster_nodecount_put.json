@@ -1,5 +1,4 @@
 {
-    "hosts": [
-        $HOSTS
-    ]
+    "hostGroupAdjustments":
+        $HOST_GROUPS
 }
