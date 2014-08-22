@@ -115,9 +115,9 @@ class CloudbreakClient {
 
     def void putCluster(String stackId, Map<String, Integer> hostgroupAssociations) throws Exception {
         log.debug("Puting cluster ...")
-        StringBuilder hosts = new StringBuilder()
+        StringBuffer hosts = new StringBuffer()
         for (Map.Entry<String, Integer> entry : hostgroupAssociations.entrySet()) {
-            hosts.append(String.format("{\"%s\":%d},", entry.getKey(), entry.getValue()))
+            hosts.append(String.format("{\"%s\":%s},", entry.getKey(), entry.getValue()))
         }
         def binding = ["HOSTS": hosts.toString().substring(0, hosts.toString().length()-1)]
         def json = createJson(Resource.CLUSTER_NODECOUNT_PUT.template(), binding)
