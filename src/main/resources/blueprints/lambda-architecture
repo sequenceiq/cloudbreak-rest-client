@@ -1,7 +1,14 @@
 {
+  "configurations": [
+    {
+      "global": {
+        "nagios_contact": ""
+      }
+    }
+  ],
   "host_groups": [
     {
-      "name": "host_group_1",
+      "name": "master_1",
       "components": [
         {
           "name": "ZOOKEEPER_SERVER"
@@ -46,7 +53,7 @@
           "name": "MAPREDUCE2_CLIENT"
         },
         {
-          "name": "DATANODE"
+          "name": "NAMENODE"
         },
         {
           "name": "GANGLIA_MONITOR"
@@ -58,7 +65,7 @@
       "cardinality": "1"
     },
     {
-      "name": "host_group_2",
+      "name": "slave_1",
       "components": [
         {
           "name": "ZOOKEEPER_SERVER"
@@ -112,7 +119,7 @@
       "cardinality": "1"
     },
     {
-      "name": "host_group_3",
+      "name": "slave_2",
       "components": [
         {
           "name": "ZOOKEEPER_SERVER"
@@ -122,9 +129,6 @@
         },
         {
           "name": "PIG"
-        },
-        {
-          "name": "NAMENODE"
         },
         {
           "name": "SUPERVISOR"
