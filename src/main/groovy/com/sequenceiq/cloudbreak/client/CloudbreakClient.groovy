@@ -114,11 +114,12 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def void putCluster(String ambari, Map<String, Integer> hostGroupAssociations) throws Exception {
+    def int putCluster(String ambari, Map<String, Integer> hostGroupAssociations) throws Exception {
         def stackId = getStackId(ambari)
         if (stackId) {
             putCluster(stackId, hostGroupAssociations);
         }
+        stackId
     }
 
     def void putCluster(int stackId, Map<String, Integer> hostGroupAssociations) throws Exception {
@@ -134,11 +135,19 @@ class CloudbreakClient {
         doPut(putCtx)
     }
 
-    def void putStack(String ambari, int scalingAdjustment) throws Exception {
+    def String getStackStatus(int stackId) {
+        String path = "${Resource.STACKS.path()}/$stackId/status"
+        Map getCtx = createGetRequestContext(path);
+        def resp = doGet(getCtx)
+        resp?.data?.status
+    }
+
+    def int putStack(String ambari, int scalingAdjustment) throws Exception {
         def stackId = getStackId(ambari)
         if (stackId) {
             putStack(stackId, scalingAdjustment)
         }
+        stackId
     }
 
     def void putStack(int id, int scalingAdjustment) throws Exception {
@@ -168,7 +177,7 @@ class CloudbreakClient {
 
     def boolean health() throws Exception {
         log.debug("Checking health ...")
-        Map getCtx = createGetRequestContext('health', null)
+        Map getCtx = createGetRequestContext('health')
         Object healthObj = doGet(getCtx)
         return healthObj.data.status == 'ok'
     }
@@ -358,43 +367,41 @@ class CloudbreakClient {
     }
 
     def private List getAllAsList(Resource resource) throws Exception {
-        Map getCtx = createGetRequestContext(resource.path(), [:]);
+        Map getCtx = createGetRequestContext(resource.path());
         Object response = doGet(getCtx);
         return response?.data
     }
 
     def private Object getOne(Resource resource, String id) throws Exception {
         String path = resource.path() + "/$id"
-        Map getCtx = createGetRequestContext(path, [:]);
+        Map getCtx = createGetRequestContext(path);
         Object response = doGet(getCtx)
         return response?.data
     }
 
     def private Object getNothing(Resource resource) throws Exception {
         String path = resource.path()
-        Map getCtx = createGetRequestContext(path, [:]);
+        Map getCtx = createGetRequestContext(path);
         Object response = doGet(getCtx)
         return response?.data
     }
 
     def private Object getOne(String resource) throws Exception {
         String path = resource
-        Map getCtx = createGetRequestContext(path, [:]);
+        Map getCtx = createGetRequestContext(path);
         Object response = doGet(getCtx)
         return response?.data
     }
 
     def private Object deleteOne(Resource resource, String id) throws Exception {
         String path = resource.path() + "/$id"
-        Map getCtx = createGetRequestContext(path, [:]);
+        Map getCtx = createGetRequestContext(path);
         Object response = doDelete(getCtx)
         return response?.data
     }
 
     def private Object doGet(Map getCtx) throws Exception {
-        Object response = null;
-        response = restClient.get(getCtx)
-        return response;
+        restClient.get(getCtx)
     }
 
     def private Object doDelete(Map getCtx) throws Exception {
@@ -425,11 +432,8 @@ class CloudbreakClient {
         return response;
     }
 
-    def private Map createGetRequestContext(String resourcePath, Map ctx) throws Exception {
-        Map context = [:]
-        String uri = "${restClient.uri}$resourcePath"
-        context.put('path', uri)
-        return context
+    def private Map createGetRequestContext(String resourcePath) throws Exception {
+        return ["path": "${restClient.uri}$resourcePath"]
     }
 
     def private Map createPostRequestContext(String resourcePath, Map ctx) throws Exception {
