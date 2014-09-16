@@ -1,14 +1,11 @@
 import com.sequenceiq.cloudbreak.client.CloudbreakClient
 import groovy.util.logging.Slf4j
-import spock.lang.Ignore
 import spock.lang.Specification
 
-
 @Slf4j
-@Ignore
 class CloudbreakClientTest extends Specification {
 
-    def CloudbreakClient cloudbreakClient = new CloudbreakClient('localhost', '8080', 'cbuser@sequenceiq.com', 'test1235');
+        def CloudbreakClient cloudbreakClient = new CloudbreakClient('localhost', '9090', 'token');
 
     def "test health check"() {
 

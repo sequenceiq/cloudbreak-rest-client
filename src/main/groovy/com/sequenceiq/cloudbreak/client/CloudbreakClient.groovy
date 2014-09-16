@@ -1,7 +1,5 @@
 package com.sequenceiq.cloudbreak.client
-
 import groovy.json.JsonBuilder
-import groovy.json.JsonSlurper
 import groovy.text.SimpleTemplateEngine
 import groovy.text.TemplateEngine
 import groovy.util.logging.Slf4j
@@ -13,17 +11,17 @@ import groovyx.net.http.RESTClient
 class CloudbreakClient {
 
     def private enum Resource {
-        CREDENTIALS_EC2("credentials", "credentials_ec2.json"),
-        CREDENTIALS_AZURE("credentials", "credentials_azure.json"),
-        CREDENTIALS("credentials", "credentials.json"),
-        TEMPLATES("templates", "template.json"),
-        TEMPLATES_EC2("templates", "template_ec2.json"),
-        SPOT_TEMPLATES_EC2("templates", "template_spot_ec2.json"),
-        TEMPLATES_AZURE("templates", "template_azure.json"),
-        STACKS("stacks", "stack.json"),
+        CREDENTIALS_EC2("user/credentials", "credentials_ec2.json"),
+        CREDENTIALS_AZURE("user/credentials", "credentials_azure.json"),
+        CREDENTIALS("user/credentials", "credentials.json"),
+        TEMPLATES("user/templates", "template.json"),
+        TEMPLATES_EC2("user/templates", "template_ec2.json"),
+        SPOT_TEMPLATES_EC2("user/templates", "template_spot_ec2.json"),
+        TEMPLATES_AZURE("user/templates", "template_azure.json"),
+        STACKS("user/stacks", "stack.json"),
         STACK_NODECOUNT_PUT("stacks", "stack_nodecount_put.json"),
         CLUSTER_NODECOUNT_PUT("stacks/stack-id/cluster", "cluster_nodecount_put.json"),
-        BLUEPRINTS("blueprints", "blueprint.json"),
+        BLUEPRINTS("user/blueprints", "blueprint.json"),
         CLUSTERS("stacks/stack-id/cluster", "cluster.json"),
         CERTIFICATES("credentials/certificate", "certificate.json"),
         ME("me", "me.json")
@@ -47,12 +45,10 @@ class CloudbreakClient {
 
     def RESTClient restClient;
     def TemplateEngine engine = new SimpleTemplateEngine()
-    def slurper = new JsonSlurper()
 
-
-    CloudbreakClient(host = 'localhost', port = '8080', user = 'cbuser@sequenceiq.com', password = 'test123') {
+    CloudbreakClient(host, port, token) {
         restClient = new RESTClient("http://${host}:${port}/" as String)
-        restClient.headers['Authorization'] = 'Basic ' + "$user:$password".getBytes('iso-8859-1').encodeBase64()
+        restClient.headers['Authorization'] = 'Bearer ' + token
     }
 
     def String postStack(String stackName, String nodeCount, String credentialId, String templateId) throws Exception {

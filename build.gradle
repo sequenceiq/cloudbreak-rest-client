@@ -72,6 +72,11 @@ task buildInfo(type: BuildInfoTask) {
     buildVersion = version
 }
 
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
 compileJava.dependsOn buildInfo
 
 class BuildInfoTask extends DefaultTask {
@@ -100,3 +105,8 @@ class BuildInfoTask extends DefaultTask {
         }
     }
 }
+
+artifacts {
+    archives sourcesJar
+}
+
