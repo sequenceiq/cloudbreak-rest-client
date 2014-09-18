@@ -5,7 +5,7 @@ import spock.lang.Specification
 @Slf4j
 class CloudbreakClientTest extends Specification {
 
-        def CloudbreakClient cloudbreakClient = new CloudbreakClient('localhost', '9090', 'token');
+        def CloudbreakClient cloudbreakClient = new CloudbreakClient('localhost', '9090', 'eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJlYTYzNzZkNy04NjRiLTQwZWYtOTg5OS00ZGM4MDFlYTZlNjEiLCJzdWIiOiI2OTg5NDZmMy00NTU4LTRmYTUtYWMxZS1iMjI5YTk0MGFjODMiLCJzY29wZSI6WyJjbG91ZGJyZWFrLnRlbXBsYXRlcyIsImNsb3VkYnJlYWsuY3JlZGVudGlhbHMiLCJjbG91ZGJyZWFrLnN0YWNrcyIsInBhc3N3b3JkLndyaXRlIiwib3BlbmlkIiwiY2xvdWRicmVhay5ibHVlcHJpbnRzIl0sImNsaWVudF9pZCI6ImNsb3VkYnJlYWtfc2hlbGwiLCJjaWQiOiJjbG91ZGJyZWFrX3NoZWxsIiwidXNlcl9pZCI6IjY5ODk0NmYzLTQ1NTgtNGZhNS1hYzFlLWIyMjlhOTQwYWM4MyIsInVzZXJfbmFtZSI6InBhdWwiLCJlbWFpbCI6InBhdWxAdGVzdC5vcmciLCJpYXQiOjE0MTEwNDcwMjAsImV4cCI6MTQxMTA5MDIyMCwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3VhYS9vYXV0aC90b2tlbiIsImF1ZCI6WyJjbG91ZGJyZWFrIiwib3BlbmlkIiwicGFzc3dvcmQiXX0.MsBd8ybhHs2P-aBLVgshsmOmnhW39-Ta9tTGsDY0_aU');
 
     def "test health check"() {
 
@@ -22,10 +22,10 @@ class CloudbreakClientTest extends Specification {
         log.debug("RESP: {}", resp)
     }
 
-    def "test post credentials"() {
+    def "test post template"() {
 
         expect:
-        Object resp = cloudbreakClient.postBlueprint("Blueprint mamam")
+        Object resp = cloudbreakClient.postEc2Template("mytemplate", "my description", "EU_WEST_1", "ami-7778af00", "0.0.0.0/0", "T2Small", "2", "100", "Gp2");
         log.debug("RESP: {}", resp)
     }
 
