@@ -2,6 +2,7 @@
     "cloudPlatform": "$CLOUD_PLATFORM",
     "name": "$NAME",
     "description": "$DESCRIPTION",
+    "publicInAccount": "$PUBLIC_IN_ACCOUNT",
     "parameters": {
         "region": "$REGION",
         "amiId": "$AMI",
