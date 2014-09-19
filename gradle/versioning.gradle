@@ -8,7 +8,7 @@ buildscript {
 }
 
 def majorVersion = 0
-def minorVersion = 3
+def minorVersion = 2
 
 def env = project.hasProperty('env') ? project.getProperty('env') : 'local'
 def config = new ConfigSlurper(env).parse(file("$rootDir/gradle/config/buildConfig.groovy").toURL())
