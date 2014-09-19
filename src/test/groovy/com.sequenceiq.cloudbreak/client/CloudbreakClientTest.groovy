@@ -50,6 +50,12 @@ class CloudbreakClientTest extends Specification {
         println mapResp
     }
 
+    def "test delete template"() {
+        expect:
+        Object resp = cloudbreakClient.deleteTemplate("50")
+        println resp
+    }
+
 
     // CREDENTIALS
 
