@@ -159,9 +159,9 @@ class CloudbreakClient {
         doPut(putCtx)
     }
 
-    def void postCluster(String clusterName, Integer blueprintId, String descrition, Integer stackId) throws Exception {
+    def void postCluster(String name, Integer blueprintId, String description, Integer stackId) throws Exception {
         log.debug("Posting cluster ...")
-        def binding = ["CLUSTER_NAME": clusterName, "BLUEPRINT_ID": blueprintId, "DESCRIPTION": descrition]
+        def binding = ["NAME": name, "BLUEPRINT_ID": blueprintId, "DESCRIPTION": description]
         def json = createJson(Resource.CLUSTERS.template(), binding)
         String path = Resource.CLUSTERS.path().replaceFirst("stack-id", stackId.toString())
         def Map postCtx = createPostRequestContext(path, ['json': json])
@@ -180,11 +180,6 @@ class CloudbreakClient {
         Map getCtx = createGetRequestContext('health')
         Object healthObj = doGet(getCtx)
         return healthObj.data.status == 'ok'
-    }
-
-    def boolean login() throws Exception {
-        log.debug("Getting login...")
-        return getNothing(Resource.ME).email != null
     }
 
     def List<Map> getCredentials() throws Exception {
@@ -362,13 +357,6 @@ class CloudbreakClient {
 
     def private Object getOne(Resource resource, String id) throws Exception {
         String path = resource.path() + "/$id"
-        Map getCtx = createGetRequestContext(path);
-        Object response = doGet(getCtx)
-        return response?.data
-    }
-
-    def private Object getNothing(Resource resource) throws Exception {
-        String path = resource.path()
         Map getCtx = createGetRequestContext(path);
         Object response = doGet(getCtx)
         return response?.data
