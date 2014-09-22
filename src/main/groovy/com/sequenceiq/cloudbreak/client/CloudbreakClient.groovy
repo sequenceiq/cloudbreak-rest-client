@@ -305,22 +305,22 @@ class CloudbreakClient {
 
     def Object deleteStack(String id) throws Exception {
         log.debug("Delete stack...")
-        return deleteOne(Resource.STACKS, id)
+        return deleteOne(Resource.STACK, id)
     }
 
     def Object deleteTemplate(String id) throws Exception {
         log.debug("Delete template...")
-        return deleteOne(Resource.TEMPLATES, id)
+        return deleteOne(Resource.TEMPLATE, id)
     }
 
     def Object deleteCredential(String id) throws Exception {
         log.debug("Delete credential...")
-        return deleteOne(Resource.CREDENTIALS, id)
+        return deleteOne(Resource.CREDENTIAL, id)
     }
 
     def Object deleteBlueprint(String id) throws Exception {
         log.debug("Delete blueprint...")
-        return deleteOne(Resource.BLUEPRINTS, id)
+        return deleteOne(Resource.BLUEPRINT, id)
     }
 
     def Object getCluster(String id) throws Exception {
@@ -346,7 +346,7 @@ class CloudbreakClient {
 
     def Object terminateStack(String id) throws Exception {
         log.debug("Terminate stack...")
-        return deleteOne(Resource.STACKS, id)
+        return deleteOne(Resource.STACK, id)
     }
 
     def private List getAllAsList(Resource resource) throws Exception {
