@@ -2,6 +2,5 @@
    "nodeCount":$NODE_COUNT,
    "templateId":$TEMPLATE_ID,
    "name":"$STACK_NAME",
-   "credentialId":$CREDENTIAL_ID,
-   "publicInAccount": "$PUBLIC_IN_ACCOUNT"
+   "credentialId":$CREDENTIAL_ID
 }
