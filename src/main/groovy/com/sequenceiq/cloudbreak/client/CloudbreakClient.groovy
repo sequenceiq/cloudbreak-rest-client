@@ -11,24 +11,32 @@ import groovyx.net.http.RESTClient
 class CloudbreakClient {
 
     def private enum Resource {
-        CREDENTIALS_EC2("user/credentials", "credentials_ec2.json"),
-        CREDENTIALS_AZURE("user/credentials", "credentials_azure.json"),
-        CREDENTIALS("user/credentials", "credentials.json"),
-        CREDENTIAL("credentials", ""),
-        TEMPLATES("user/templates", "template.json"),
-        TEMPLATES_EC2("user/templates", "template_ec2.json"),
-        SPOT_TEMPLATES_EC2("user/templates", "template_spot_ec2.json"),
-        TEMPLATES_AZURE("user/templates", "template_azure.json"),
-        TEMPLATE("templates", ""),
-        STACKS("user/stacks", "stack.json"),
-        STACK_NODECOUNT_PUT("stacks", "stack_nodecount_put.json"),
-        STACK("stacks", "stack.json"),
+        USER_CREDENTIALS("user/credentials", "credentials.json"),
+        USER_CREDENTIALS_EC2("user/credentials", "credentials_ec2.json"),
+        USER_CREDENTIALS_AZURE("user/credentials", "credentials_azure.json"),
+        ACCOUNT_CREDENTIALS("account/credentials", "credentials.json"),
+        ACCOUNT_CREDENTIALS_EC2("account/credentials", "credentials_ec2.json"),
+        ACCOUNT_CREDENTIALS_AZURE("account/credentials", "credentials_azure.json"),
+        GLOBAL_CREDENTIALS("credentials", ""),
+        USER_TEMPLATES("user/templates", "template.json"),
+        USER_TEMPLATES_EC2("user/templates", "template_ec2.json"),
+        USER_TEMPLATES_EC2_SPOT("user/templates", "template_spot_ec2.json"),
+        USER_TEMPLATES_AZURE("user/templates", "template_azure.json"),
+        ACCOUNT_TEMPLATES("account/templates", "template.json"),
+        ACCOUNT_TEMPLATES_EC2("account/templates", "template_ec2.json"),
+        ACCOUNT_TEMPLATES_EC2_SPOT("account/templates", "template_spot_ec2.json"),
+        ACCOUNT_TEMPLATES_AZURE("account/templates", "template_azure.json"),
+        GLOBAL_TEMPLATES("templates", ""),
+        USER_STACKS("user/stacks", "stack.json"),
+        ACCOUNT_STACKS("account/stacks", "stack.json"),
+        GLOBAL_STACKS_NODECOUNT_PUT("stacks", "stack_nodecount_put.json"),
+        GLOBAL_STACKS("stacks", ""),
+        USER_BLUEPRINTS("user/blueprints", "blueprint.json"),
+        ACCOUNT_BLUEPRINTS("account/blueprints", "blueprint.json"),
+        GLOBAL_BLUEPRINTS("blueprints", "blueprint.json"),
         CLUSTER_NODECOUNT_PUT("stacks/stack-id/cluster", "cluster_nodecount_put.json"),
-        BLUEPRINTS("user/blueprints", "blueprint.json"),
-        BLUEPRINT("blueprints", "blueprint.json"),
         CLUSTERS("stacks/stack-id/cluster", "cluster.json"),
-        CERTIFICATES("credentials/certificate", "certificate.json"),
-        ME("me", "me.json")
+        CERTIFICATES("credentials/certificate", "certificate.json")
 
         def path
         def template
@@ -55,33 +63,53 @@ class CloudbreakClient {
         restClient.headers['Authorization'] = 'Bearer ' + token
     }
 
-    def String postStack(String stackName, String nodeCount, String credentialId, String templateId) throws Exception {
+    def String postStack(String stackName, String nodeCount, String credentialId, String templateId, Boolean publicInAccount) throws Exception {
         log.debug("Posting stack ...")
-        def binding = ["NODE_COUNT": nodeCount, "STACK_NAME": stackName, "CREDENTIAL_ID": credentialId, "TEMPLATE_ID": templateId, "PUBLIC_IN_ACCOUNT": true]
-        def response = processPost(Resource.STACKS, binding)
+        def binding = ["NODE_COUNT": nodeCount, "STACK_NAME": stackName, "CREDENTIAL_ID": credentialId, "TEMPLATE_ID": templateId]
+        def response;
+        if (publicInAccount){
+            response = processPost(Resource.ACCOUNT_STACKS, binding)
+        } else {
+            response = processPost(Resource.USER_STACKS, binding)
+        }
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
 
-    def String postBlueprint(String name, String description, String blueprint) throws Exception {
+    def String postBlueprint(String name, String description, String blueprint, Boolean publicInAccount) throws Exception {
         log.debug("Posting blueprint ...")
-        def binding = ["BLUEPRINT": blueprint, "NAME": name, "DESCRIPTION": description, "PUBLIC_IN_ACCOUNT": true]
-        def response = processPost(Resource.BLUEPRINTS, binding)
+        def binding = ["GLOBAL_BLUEPRINTS": blueprint, "NAME": name, "DESCRIPTION": description]
+        def response;
+        if (publicInAccount){
+            response = processPost(Resource.ACCOUNT_BLUEPRINTS, binding)
+        } else {
+            response = processPost(Resource.USER_BLUEPRINTS, binding)
+        }
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
 
-    def String postEc2Credential(String name, String description, String roleArn, String sshKey) throws Exception {
+    def String postEc2Credential(String name, String description, String roleArn, String sshKey, Boolean publicInAccount) throws Exception {
         log.debug("Posting credential ...")
-        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "ROLE_ARN": roleArn, "DESCRIPTION": description, "SSHKEY": sshKey, "PUBLIC_IN_ACCOUNT": true]
-        def response = processPost(Resource.CREDENTIALS_EC2, binding)
+        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "ROLE_ARN": roleArn, "DESCRIPTION": description, "SSHKEY": sshKey]
+        def response;
+        if (publicInAccount){
+            response = processPost(Resource.ACCOUNT_CREDENTIALS_EC2, binding)
+        } else {
+            response = processPost(Resource.USER_CREDENTIALS_EC2, binding)
+        }
         return response?.data?.id
     }
 
-    def String postAzureCredential(String name, String description, String subscriptionId, String jksPassword, String sshKey) throws Exception {
+    def String postAzureCredential(String name, String description, String subscriptionId, String jksPassword, String sshKey, Boolean publicInAccount) throws Exception {
         log.debug("Posting credential ...")
-        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "SUBSCRIPTIONID": subscriptionId, "JKSPASSWORD": jksPassword, "SSHKEY": sshKey, "PUBLIC_IN_ACCOUNT": true]
-        def response = processPost(Resource.CREDENTIALS_AZURE, binding)
+        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "SUBSCRIPTIONID": subscriptionId, "JKSPASSWORD": jksPassword, "SSHKEY": sshKey]
+        def response;
+        if (publicInAccount){
+            response = processPost(Resource.ACCOUNT_CREDENTIALS_AZURE, binding)
+        } else {
+            response = processPost(Resource.USER_CREDENTIALS_AZURE, binding)
+        }
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
@@ -90,26 +118,41 @@ class CloudbreakClient {
         return getOne(Resource.CERTIFICATE, id).text
     }
 
-    def String postSpotEc2Template(String name, String description, String region, String amiId, String sshLocation, String instanceType, String volumeCount, String volumeSize, String volumeType, String spotPrice) throws Exception {
+    def String postSpotEc2Template(String name, String description, String region, String amiId, String sshLocation, String instanceType, String volumeCount, String volumeSize, String volumeType, String spotPrice, Boolean publicInAccount) throws Exception {
         log.debug("testing credential ...")
-        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "REGION": region, "AMI": amiId, "SSH_LOCATION": sshLocation, "INSTANCE_TYPE": instanceType, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "VOLUME_TYPE": volumeType, "SPOT_PRICE": spotPrice, "PUBLIC_IN_ACCOUNT": true]
-        def response = processPost(Resource.SPOT_TEMPLATES_EC2, binding)
+        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "REGION": region, "AMI": amiId, "SSH_LOCATION": sshLocation, "INSTANCE_TYPE": instanceType, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "VOLUME_TYPE": volumeType, "SPOT_PRICE": spotPrice]
+        def response;
+        if (publicInAccount){
+            response = processPost(Resource.ACCOUNT_TEMPLATES_EC2_SPOT, binding)
+        } else {
+            response = processPost(Resource.USER_TEMPLATES_EC2_SPOT, binding)
+        }
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
 
-    def String postEc2Template(String name, String description, String region, String amiId, String sshLocation, String instanceType, String volumeCount, String volumeSize, String volumeType) throws Exception {
+    def String postEc2Template(String name, String description, String region, String amiId, String sshLocation, String instanceType, String volumeCount, String volumeSize, String volumeType, Boolean publicInAccount) throws Exception {
         log.debug("testing credential ...")
-        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "REGION": region, "AMI": amiId, "SSH_LOCATION": sshLocation, "INSTANCE_TYPE": instanceType, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "VOLUME_TYPE": volumeType, "PUBLIC_IN_ACCOUNT": true]
-        def response = processPost(Resource.TEMPLATES_EC2, binding)
+        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "REGION": region, "AMI": amiId, "SSH_LOCATION": sshLocation, "INSTANCE_TYPE": instanceType, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "VOLUME_TYPE": volumeType]
+        def response;
+        if (publicInAccount){
+            response = processPost(Resource.ACCOUNT_TEMPLATES_EC2, binding)
+        } else {
+            response = processPost(Resource.USER_TEMPLATES_EC2, binding)
+        }
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
 
-    def String postAzureTemplate(String name, String description, String region, String instanceName, String instanceType, String volumeCount, String volumeSize) throws Exception {
+    def String postAzureTemplate(String name, String description, String region, String instanceName, String instanceType, String volumeCount, String volumeSize, Boolean publicInAccount) throws Exception {
         log.debug("testing credential ...")
-        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "IMAGE_NAME": instanceName, "REGION": region, "INSTANCE_TYPE": instanceType, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "PUBLIC_IN_ACCOUNT": true]
-        def response = processPost(Resource.TEMPLATES_AZURE, binding)
+        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "IMAGE_NAME": instanceName, "REGION": region, "INSTANCE_TYPE": instanceType, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize]
+        def response;
+        if (publicInAccount){
+            response = processPost(Resource.ACCOUNT_TEMPLATES_AZURE, binding)
+        } else {
+            response = processPost(Resource.USER_TEMPLATES_AZURE, binding)
+        }
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
@@ -136,7 +179,7 @@ class CloudbreakClient {
     }
 
     def String getStackStatus(int stackId) {
-        String path = "${Resource.STACKS.path()}/$stackId/status"
+        String path = "${Resource.USER_STACKS.path()}/$stackId/status"
         Map getCtx = createGetRequestContext(path);
         def resp = doGet(getCtx)
         resp?.data?.status
@@ -153,8 +196,8 @@ class CloudbreakClient {
     def void putStack(int id, int scalingAdjustment) throws Exception {
         log.debug("Putting stack ...")
         def binding = ["NODE_COUNT": scalingAdjustment]
-        def json = createJson(Resource.STACK_NODECOUNT_PUT.template(), binding)
-        String path = Resource.STACK_NODECOUNT_PUT.path() + "/$id"
+        def json = createJson(Resource.GLOBAL_STACKS_NODECOUNT_PUT.template(), binding)
+        String path = Resource.GLOBAL_STACKS_NODECOUNT_PUT.path() + "/$id"
         def Map putCtx = createPostRequestContext(path, ['json': json])
         doPut(putCtx)
     }
@@ -182,13 +225,25 @@ class CloudbreakClient {
         return healthObj.data.status == 'ok'
     }
 
-    def List<Map> getCredentials() throws Exception {
+    def List<Map> getPrivateCredentials() throws Exception {
         log.debug("Getting credentials...")
-        getAllAsList(Resource.CREDENTIALS)
+        getAllAsList(Resource.USER_CREDENTIALS)
     }
 
-    def Map<String, String> getCredentialsMap() throws Exception {
-        def result = getCredentials()?.collectEntries {
+    def Map<String, String> getPrivateCredentialsMap() throws Exception {
+        def result = getPrivateCredentials()?.collectEntries {
+            [(it.id as String): it.name + ":" + it.cloudPlatform]
+        }
+        result ?: new HashMap()
+    }
+
+    def List<Map> getAccountCredentials() throws Exception {
+        log.debug("Getting credentials...")
+        getAllAsList(Resource.AACCOUNT_CREDENTIALS)
+    }
+
+    def Map<String, String> getAccountCredentialsMap() throws Exception {
+        def result = getAccountCredentials()?.collectEntries {
             [(it.id as String): it.name + ":" + it.cloudPlatform]
         }
         result ?: new HashMap()
@@ -207,13 +262,25 @@ class CloudbreakClient {
         result ?: new HashMap()
     }
 
-    def List<Map> getBlueprints() throws Exception {
+    def List<Map> getPrivateBlueprints() throws Exception {
         log.debug("Getting blueprints...")
-        getAllAsList(Resource.BLUEPRINTS)
+        getAllAsList(Resource.USER_BLUEPRINTS)
     }
 
     def Map<String, String> getBlueprintsMap() throws Exception {
-        def result = getBlueprints()?.collectEntries {
+        def result = getPrivateBlueprints()?.collectEntries {
+            [(it.id as String): it.name + ":" + it.blueprintName]
+        }
+        result ?: new HashMap()
+    }
+
+    def List<Map> getAccountBlueprints() throws Exception {
+        log.debug("Getting blueprints...")
+        getAllAsList(Resource.ACCOUNT_BLUEPRINTS)
+    }
+
+    def Map<String, String> getAccountBlueprintsMap() throws Exception {
+        def result = getAccountBlueprints()?.collectEntries {
             [(it.id as String): it.name + ":" + it.blueprintName]
         }
         result ?: new HashMap()
@@ -235,8 +302,25 @@ class CloudbreakClient {
         result ?: new HashMap()
     }
 
-    def Map<String, String> getTemplatesMap() throws Exception {
-        def result = getTemplates()?.collectEntries {
+    def List<Map> getPrivateTemplates() throws Exception {
+        log.debug("Getting templates...")
+        getAllAsList(Resource.USER_TEMPLATES)
+    }
+
+    def Map<String, String> getPrivateTemplatesMap() throws Exception {
+        def result = getPrivateTemplates()?.collectEntries {
+            [(it.id as String): it.name + ":" + it.description]
+        }
+        result ?: new HashMap()
+    }
+
+    def List<Map> getAccountTemplates() throws Exception {
+        log.debug("Getting templates...")
+        getAllAsList(Resource.ACCOUNT_TEMPLATES)
+    }
+
+    def Map<String, String> getAccountTemplatesMap() throws Exception {
+        def result = getAccountTemplates()?.collectEntries {
             [(it.id as String): it.name + ":" + it.description]
         }
         result ?: new HashMap()
@@ -255,8 +339,25 @@ class CloudbreakClient {
         result ?: new HashMap()
     }
 
-    def Map<String, String> getStacksMap() throws Exception {
-        def result = getStacks()?.collectEntries {
+    def List<Map> getPrivateStacks() throws Exception {
+        log.debug("Getting templates...")
+        getAllAsList(Resource.USER_STACKS)
+    }
+
+    def Map<String, String> getPrivateStacksMap() throws Exception {
+        def result = getPrivateStacks()?.collectEntries {
+            [(it.id as String): it.name + ":" + it.nodeCount]
+        }
+        result ?: new HashMap()
+    }
+
+    def List<Map> getAccountStacks() throws Exception {
+        log.debug("Getting templates...")
+        getAllAsList(Resource.ACCOUNT_STACKS)
+    }
+
+    def Map<String, String> getAccountStacksMap() throws Exception {
+        def result = getAccountStacks()?.collectEntries {
             [(it.id as String): it.name + ":" + it.nodeCount]
         }
         result ?: new HashMap()
@@ -288,39 +389,29 @@ class CloudbreakClient {
         result ?: new HashMap()
     }
 
-    def List<Map> getTemplates() throws Exception {
-        log.debug("Getting templates...")
-        getAllAsList(Resource.TEMPLATES)
-    }
-
-    def List<Map> getStacks() throws Exception {
-        log.debug("Getting templates...")
-        getAllAsList(Resource.STACKS)
-    }
-
     def Object getStack(String id) throws Exception {
         log.debug("Getting stack...")
-        return getOne(Resource.STACK, id)
+        return getOne(Resource.GLOBAL_STACKS, id)
     }
 
     def Object deleteStack(String id) throws Exception {
         log.debug("Delete stack...")
-        return deleteOne(Resource.STACK, id)
+        return deleteOne(Resource.GLOBAL_STACKS, id)
     }
 
     def Object deleteTemplate(String id) throws Exception {
         log.debug("Delete template...")
-        return deleteOne(Resource.TEMPLATE, id)
+        return deleteOne(Resource.GLOBAL_TEMPLATES, id)
     }
 
     def Object deleteCredential(String id) throws Exception {
         log.debug("Delete credential...")
-        return deleteOne(Resource.CREDENTIAL, id)
+        return deleteOne(Resource.GLOBAL_CREDENTIALS, id)
     }
 
     def Object deleteBlueprint(String id) throws Exception {
         log.debug("Delete blueprint...")
-        return deleteOne(Resource.BLUEPRINT, id)
+        return deleteOne(Resource.GLOBAL_BLUEPRINTS, id)
     }
 
     def Object getCluster(String id) throws Exception {
@@ -331,22 +422,22 @@ class CloudbreakClient {
 
     def Object getCredential(String id) throws Exception {
         log.debug("Getting credentials...")
-        return getOne(Resource.CREDENTIAL, id)
+        return getOne(Resource.GLOBAL_CREDENTIALS, id)
     }
 
     def Object getTemplate(String id) throws Exception {
         log.debug("Getting credentials...")
-        return getOne(Resource.TEMPLATE, id)
+        return getOne(Resource.GLOBAL_TEMPLATES, id)
     }
 
     def Object getBlueprint(String id) throws Exception {
         log.debug("Getting credentials...")
-        return getOne(Resource.BLUEPRINT, id)
+        return getOne(Resource.GLOBAL_BLUEPRINTS, id)
     }
 
     def Object terminateStack(String id) throws Exception {
         log.debug("Terminate stack...")
-        return deleteOne(Resource.STACK, id)
+        return deleteOne(Resource.GLOBAL_STACKS, id)
     }
 
     def private List getAllAsList(Resource resource) throws Exception {
@@ -438,7 +529,7 @@ class CloudbreakClient {
     }
 
     private int getStackId(String ambari) {
-        getStacks().find { it.ambariServerIp.equals(ambari) }?.id
+        getPrivateStacks().find { it.ambariServerIp.equals(ambari) }?.id
     }
 }
 

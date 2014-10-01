@@ -7,7 +7,7 @@ import spock.lang.Specification
 @Ignore
 class CloudbreakClientTest extends Specification {
 
-        def CloudbreakClient cloudbreakClient = new CloudbreakClient('localhost', '9090', 'eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJlYTYzNzZkNy04NjRiLTQwZWYtOTg5OS00ZGM4MDFlYTZlNjEiLCJzdWIiOiI2OTg5NDZmMy00NTU4LTRmYTUtYWMxZS1iMjI5YTk0MGFjODMiLCJzY29wZSI6WyJjbG91ZGJyZWFrLnRlbXBsYXRlcyIsImNsb3VkYnJlYWsuY3JlZGVudGlhbHMiLCJjbG91ZGJyZWFrLnN0YWNrcyIsInBhc3N3b3JkLndyaXRlIiwib3BlbmlkIiwiY2xvdWRicmVhay5ibHVlcHJpbnRzIl0sImNsaWVudF9pZCI6ImNsb3VkYnJlYWtfc2hlbGwiLCJjaWQiOiJjbG91ZGJyZWFrX3NoZWxsIiwidXNlcl9pZCI6IjY5ODk0NmYzLTQ1NTgtNGZhNS1hYzFlLWIyMjlhOTQwYWM4MyIsInVzZXJfbmFtZSI6InBhdWwiLCJlbWFpbCI6InBhdWxAdGVzdC5vcmciLCJpYXQiOjE0MTEwNDcwMjAsImV4cCI6MTQxMTA5MDIyMCwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3VhYS9vYXV0aC90b2tlbiIsImF1ZCI6WyJjbG91ZGJyZWFrIiwib3BlbmlkIiwicGFzc3dvcmQiXX0.MsBd8ybhHs2P-aBLVgshsmOmnhW39-Ta9tTGsDY0_aU');
+        def CloudbreakClient cloudbreakClient = new CloudbreakClient('localhost', '9090', 'eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIzYWVlMTI0Yy04YmZiLTQ3MmEtODY4ZC00Y2MwNjAwOThkOTYiLCJzdWIiOiI5ZTk5NmE0Ny0yMDEyLTQyOTAtODk5Yi1lYWRkY2Q0NzE2MmEiLCJzY29wZSI6WyJjbG91ZGJyZWFrLnRlbXBsYXRlcyIsImNsb3VkYnJlYWsuY3JlZGVudGlhbHMiLCJjbG91ZGJyZWFrLnN0YWNrcyIsInBhc3N3b3JkLndyaXRlIiwib3BlbmlkIiwiY2xvdWRicmVhay5ibHVlcHJpbnRzIl0sImNsaWVudF9pZCI6ImNsb3VkYnJlYWtfc2hlbGwiLCJjaWQiOiJjbG91ZGJyZWFrX3NoZWxsIiwidXNlcl9pZCI6IjllOTk2YTQ3LTIwMTItNDI5MC04OTliLWVhZGRjZDQ3MTYyYSIsInVzZXJfbmFtZSI6InN0ZWZhbiIsImVtYWlsIjoic3RlZmFuQHRlc3Qub3JnIiwiaWF0IjoxNDExMzE1ODI2LCJleHAiOjE0MTEzNTkwMjYsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MC91YWEvb2F1dGgvdG9rZW4iLCJhdWQiOlsiY2xvdWRicmVhayIsIm9wZW5pZCIsInBhc3N3b3JkIl19.XWugezRJpWdbEwmef9uUXlbI9_6UhMWFlwEljFs15p0');
 
     def "test health check"() {
 
@@ -18,28 +18,32 @@ class CloudbreakClientTest extends Specification {
     }
 
 
-    // TEMPLATES
+    // USER_TEMPLATES
 
     def "test post azure template"() {
 
         expect:
-        Object resp = cloudbreakClient.postAzureTemplate("azuretempshell", "sdfsdfsd", "NORTH_EUROPE", "ambari-docker-v1", "MEDIUM", "2", "50")
+        Object resp = cloudbreakClient.postAzureTemplate("azuretempshell2", "sdfsdfsd", "NORTH_EUROPE", "ambari-docker-v1", "MEDIUM", "2", "50", false)
         println resp
     }
 
     def "test post aws template"() {
 
         expect:
-        Object resp = cloudbreakClient.postEc2Template("mytemplate", "my description", "EU_WEST_1", "ami-7778af00", "0.0.0.0/0", "T2Small", "2", "100", "Gp2");
+        Object resp = cloudbreakClient.postEc2Template("mytemplate", "my description", "EU_WEST_1", "ami-7778af00", "0.0.0.0/0", "T2Small", "2", "100", "Gp2", true);
         println resp
     }
 
     def "test get templates"() {
         expect:
-        Object resp = cloudbreakClient.getTemplates()
+        Object resp = cloudbreakClient.getPrivateTemplates()
         println resp
-        Object mapResp = cloudbreakClient.getTemplatesMap()
+        Object mapResp = cloudbreakClient.getPrivateTemplatesMap()
         println mapResp
+        Object accResp = cloudbreakClient.getAccountTemplates()
+        println accResp
+        Object accMapResp = cloudbreakClient.getAccountTemplatesMap()
+        println accMapResp
     }
 
     def "test get template"() {
@@ -57,7 +61,7 @@ class CloudbreakClientTest extends Specification {
     }
 
 
-    // CREDENTIALS
+    // USER_CREDENTIALS
 
     def "test post credential"() {
         expect:
@@ -67,9 +71,9 @@ class CloudbreakClientTest extends Specification {
 
     def "test get credentials"() {
         expect:
-        Object resp = cloudbreakClient.getCredentials()
+        Object resp = cloudbreakClient.getPrivateCredentials()
         println resp
-        Object mapResp = cloudbreakClient.getCredentialsMap()
+        Object mapResp = cloudbreakClient.getPrivateCredentialsMap()
         println mapResp
     }
 
@@ -82,7 +86,7 @@ class CloudbreakClientTest extends Specification {
     }
 
 
-    // BLUEPRINTS
+    // USER_BLUEPRINTS
 
     def "test post blueprint"() {
         expect:
@@ -92,7 +96,7 @@ class CloudbreakClientTest extends Specification {
 
     def "test get blueprints"() {
         expect:
-        Object resp = cloudbreakClient.getBlueprints()
+        Object resp = cloudbreakClient.getPrivateBlueprints()
         println resp
         Object mapResp = cloudbreakClient.getBlueprintsMap()
         println mapResp
@@ -107,7 +111,7 @@ class CloudbreakClientTest extends Specification {
     }
 
 
-    // STACKS
+    // USER_STACKS
 
     def "test post cluster"() {
         expect:
@@ -117,7 +121,7 @@ class CloudbreakClientTest extends Specification {
 
     def "test get stacks"() {
         expect:
-        Object resp = cloudbreakClient.getStacks()
+        Object resp = cloudbreakClient.getPrivateStacks()
         println resp
         log.debug("RESP: {}", resp)
     }

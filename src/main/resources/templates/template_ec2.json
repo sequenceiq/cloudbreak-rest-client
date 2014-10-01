@@ -4,7 +4,6 @@
     "description": "$DESCRIPTION",
     "volumeCount": "$VOLUME_COUNT",
     "volumeSize": "$VOLUME_SIZE",
-    "publicInAccount": "$PUBLIC_IN_ACCOUNT",
     "parameters": {
         "region": "$REGION",
         "amiId": "$AMI",
