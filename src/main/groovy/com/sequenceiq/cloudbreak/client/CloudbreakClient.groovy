@@ -239,7 +239,7 @@ class CloudbreakClient {
 
     def List<Map> getAccountCredentials() throws Exception {
         log.debug("Getting credentials...")
-        getAllAsList(Resource.AACCOUNT_CREDENTIALS)
+        getAllAsList(Resource.ACCOUNT_CREDENTIALS)
     }
 
     def Map<String, String> getAccountCredentialsMap() throws Exception {
