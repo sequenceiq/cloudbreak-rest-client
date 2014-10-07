@@ -27,7 +27,7 @@ class CloudbreakClient {
         ACCOUNT_TEMPLATES_EC2_SPOT("account/templates", "template_spot_ec2.json"),
         ACCOUNT_TEMPLATES_AZURE("account/templates", "template_azure.json"),
         GLOBAL_TEMPLATES("templates", ""),
-        USER_STACKS("user/stacks", "stack.json"),
+        USER_STACKS("stacks", "stack.json"),
         ACCOUNT_STACKS("account/stacks", "stack.json"),
         GLOBAL_STACKS_NODECOUNT_PUT("stacks", "stack_nodecount_put.json"),
         GLOBAL_STACKS("stacks", ""),
