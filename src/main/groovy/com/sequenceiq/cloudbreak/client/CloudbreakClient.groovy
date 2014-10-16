@@ -78,7 +78,7 @@ class CloudbreakClient {
 
     def String postBlueprint(String name, String description, String blueprint, Boolean publicInAccount) throws Exception {
         log.debug("Posting blueprint ...")
-        def binding = ["GLOBAL_BLUEPRINTS": blueprint, "NAME": name, "DESCRIPTION": description]
+        def binding = ["BLUEPRINT": blueprint, "NAME": name, "DESCRIPTION": description]
         def response;
         if (publicInAccount){
             response = processPost(Resource.ACCOUNT_BLUEPRINTS, binding)
@@ -212,10 +212,10 @@ class CloudbreakClient {
     }
 
     def void addDefaultBlueprints() throws HttpResponseException {
-        postBlueprint("multi-node-hdfs-yarn", "multi-node-hdfs-yarn", getResourceContent("blueprints/multi-node-hdfs-yarn"))
-        postBlueprint("single-node-hdfs-yarn", "single-node-hdfs-yarn", getResourceContent("blueprints/single-node-hdfs-yarn"))
-        postBlueprint("lambda-architecture", "lambda-architecture", getResourceContent("blueprints/lambda-architecture"))
-        postBlueprint("warmup", "warmup", getResourceContent("blueprints/warmup"))
+        postBlueprint("multi-node-hdfs-yarn", "multi-node-hdfs-yarn", getResourceContent("blueprints/multi-node-hdfs-yarn"), false)
+        postBlueprint("single-node-hdfs-yarn", "single-node-hdfs-yarn", getResourceContent("blueprints/single-node-hdfs-yarn"), false)
+        postBlueprint("lambda-architecture", "lambda-architecture", getResourceContent("blueprints/lambda-architecture"), false)
+        postBlueprint("warmup", "warmup", getResourceContent("blueprints/warmup"), false)
     }
 
     def boolean health() throws Exception {
