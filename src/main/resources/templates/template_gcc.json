@@ -6,6 +6,7 @@
     "volumeSize": "$VOLUME_SIZE",
     "parameters": {
         "gccZone": "$GCC_ZONE",
-        "gccInstanceType": "$GCC_INSTANCE_TYPE"
+        "gccInstanceType": "$GCC_INSTANCE_TYPE",
+        "gccImageType": "$GCC_IMAGE_TYPE"
     }
 }
