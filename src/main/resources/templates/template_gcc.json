@@ -2,10 +2,10 @@
     "cloudPlatform": "$CLOUD_PLATFORM",
     "name": "$NAME",
     "description": "$DESCRIPTION",
+    "volumeCount": "$VOLUME_COUNT",
+    "volumeSize": "$VOLUME_SIZE",
     "parameters": {
-        "region": "$REGION",
-        "amiId": "$AMI",
-        "sshLocation": "$SSH_LOCATION",
-        "instanceType": "$INSTANCE_TYPE"
+        "gccZone": "$GCC_ZONE",
+        "gccInstanceType": "$GCC_INSTANCE_TYPE"
     }
 }
