@@ -62,8 +62,10 @@ class CloudbreakClient {
     def RESTClient restClient;
     def TemplateEngine engine = new SimpleTemplateEngine()
 
-    CloudbreakClient(host, port, token) {
-        restClient = new RESTClient("http://${host}:${port}/" as String)
+    CloudbreakClient(String address, token) {
+        address = address.endsWith("/") ? address : address + "/";
+        restClient = new RESTClient(address as String)
+        restClient.ignoreSSLIssues();
         restClient.headers['Authorization'] = 'Bearer ' + token
     }
 
