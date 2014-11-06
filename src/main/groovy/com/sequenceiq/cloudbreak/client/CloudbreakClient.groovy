@@ -1,4 +1,5 @@
 package com.sequenceiq.cloudbreak.client
+
 import groovy.json.JsonBuilder
 import groovy.text.SimpleTemplateEngine
 import groovy.text.TemplateEngine
@@ -35,6 +36,7 @@ class CloudbreakClient {
         ACCOUNT_STACKS("account/stacks", "stack.json"),
         GLOBAL_STACKS_NODECOUNT_PUT("stacks", "stack_nodecount_put.json"),
         GLOBAL_STACKS("stacks", ""),
+        STACK_AMBARI("stacks/ambari", ""),
         USER_BLUEPRINTS("user/blueprints", "blueprint.json"),
         ACCOUNT_BLUEPRINTS("account/blueprints", "blueprint.json"),
         GLOBAL_BLUEPRINTS("blueprints", "blueprint.json"),
@@ -73,7 +75,7 @@ class CloudbreakClient {
         log.debug("Posting stack ...")
         def binding = ["NODE_COUNT": nodeCount, "STACK_NAME": stackName, "CREDENTIAL_ID": credentialId, "TEMPLATE_ID": templateId]
         def response;
-        if (publicInAccount){
+        if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_STACKS, binding)
         } else {
             response = processPost(Resource.USER_STACKS, binding)
@@ -86,7 +88,7 @@ class CloudbreakClient {
         log.debug("Posting blueprint ...")
         def binding = ["BLUEPRINT": blueprint, "NAME": name, "DESCRIPTION": description]
         def response;
-        if (publicInAccount){
+        if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_BLUEPRINTS, binding)
         } else {
             response = processPost(Resource.USER_BLUEPRINTS, binding)
@@ -99,7 +101,7 @@ class CloudbreakClient {
         log.debug("Posting credential ...")
         def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "ROLE_ARN": roleArn, "DESCRIPTION": description, "SSHKEY": sshKey]
         def response;
-        if (publicInAccount){
+        if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_CREDENTIALS_EC2, binding)
         } else {
             response = processPost(Resource.USER_CREDENTIALS_EC2, binding)
@@ -111,7 +113,7 @@ class CloudbreakClient {
         log.debug("Posting credential ...")
         def binding = ["CLOUD_PLATFORM": "GCC", "NAME": name, "PROJECT_ID": projectId, "DESCRIPTION": description, "SSHKEY": sshKey, "SERVICE_ACCOUNT_ID": serviceAccountId, "SERVICE_ACCOUNT_PRIVATE_KEY": serviceAccountPrivateKey]
         def response;
-        if (publicInAccount){
+        if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_CREDENTIALS_GCC, binding)
         } else {
             response = processPost(Resource.USER_CREDENTIALS_GCC, binding)
@@ -123,7 +125,7 @@ class CloudbreakClient {
         log.debug("Posting credential ...")
         def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "SUBSCRIPTIONID": subscriptionId, "JKSPASSWORD": jksPassword, "SSHKEY": sshKey]
         def response;
-        if (publicInAccount){
+        if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_CREDENTIALS_AZURE, binding)
         } else {
             response = processPost(Resource.USER_CREDENTIALS_AZURE, binding)
@@ -140,7 +142,7 @@ class CloudbreakClient {
         log.debug("testing credential ...")
         def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "REGION": region, "AMI": amiId, "SSH_LOCATION": sshLocation, "INSTANCE_TYPE": instanceType, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "VOLUME_TYPE": volumeType, "SPOT_PRICE": spotPrice]
         def response;
-        if (publicInAccount){
+        if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_TEMPLATES_EC2_SPOT, binding)
         } else {
             response = processPost(Resource.USER_TEMPLATES_EC2_SPOT, binding)
@@ -153,7 +155,7 @@ class CloudbreakClient {
         log.debug("testing credential ...")
         def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "REGION": region, "AMI": amiId, "SSH_LOCATION": sshLocation, "INSTANCE_TYPE": instanceType, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "VOLUME_TYPE": volumeType]
         def response;
-        if (publicInAccount){
+        if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_TEMPLATES_EC2, binding)
         } else {
             response = processPost(Resource.USER_TEMPLATES_EC2, binding)
@@ -166,7 +168,7 @@ class CloudbreakClient {
         log.debug("testing credential ...")
         def binding = ["CLOUD_PLATFORM": "GCC", "GCC_IMAGE_TYPE": imageName, "NAME": name, "GCC_ZONE": gccZone, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "GCC_INSTANCE_TYPE": gccInstanceType]
         def response;
-        if (publicInAccount){
+        if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_TEMPLATES_GCC, binding)
         } else {
             response = processPost(Resource.USER_TEMPLATES_GCC, binding)
@@ -179,13 +181,32 @@ class CloudbreakClient {
         log.debug("testing credential ...")
         def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "IMAGE_NAME": instanceName, "REGION": region, "INSTANCE_TYPE": instanceType, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize]
         def response;
-        if (publicInAccount){
+        if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_TEMPLATES_AZURE, binding)
         } else {
             response = processPost(Resource.USER_TEMPLATES_AZURE, binding)
         }
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
+    }
+
+    def boolean hasAccess(String userId, String account, String ambariAddress) throws HttpResponseException {
+        def stack = getStackByAmbari(ambariAddress)
+        if (stack.owner == userId) {
+            return true
+        } else if (stack.public && stack.account == account) {
+            return true
+        }
+    }
+
+    def int resolveToStackId(String ambariAddress) throws HttpResponseException {
+        getStackByAmbari(ambariAddress)?.id
+    }
+
+    def private getStackByAmbari(String ambariAddress) {
+        def json = new JsonBuilder(["ambariAddress": ambariAddress]).toPrettyString()
+        def context = createPostRequestContext(Resource.STACK_AMBARI.getPath(), ["json": json])
+        doPost(context)?.data
     }
 
     def int putCluster(String ambari, Map<String, Integer> hostGroupAssociations) throws Exception {
