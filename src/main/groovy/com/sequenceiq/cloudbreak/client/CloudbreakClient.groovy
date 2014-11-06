@@ -190,11 +190,27 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
+    def boolean hasAccess(String userId, String account, String ambariAddress) {
+        def stack = getStackByAmbari(ambariAddress)
+        if (stack) {
+            if (stack.owner == userId) {
+                return true
+            } else if (stack.public && stack.account == account) {
+                return true
+            }
+            return false
+        }
+        return false
+    }
+
     def int resolveToStackId(String ambariAddress) {
+        getStackByAmbari(ambariAddress)?.id
+    }
+
+    def private getStackByAmbari(String ambariAddress) {
         def json = new JsonBuilder(["ambariAddress": ambariAddress]).toPrettyString()
         def context = createPostRequestContext(Resource.STACK_AMBARI.getPath(), ["json": json])
-        def response = doPost(context)
-        response?.data?.id
+        doPost(context)?.data
     }
 
     def int putCluster(String ambari, Map<String, Integer> hostGroupAssociations) throws Exception {
