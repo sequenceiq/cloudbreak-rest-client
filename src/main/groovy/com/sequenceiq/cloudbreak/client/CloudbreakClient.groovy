@@ -190,20 +190,16 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def boolean hasAccess(String userId, String account, String ambariAddress) {
+    def boolean hasAccess(String userId, String account, String ambariAddress) throws HttpResponseException {
         def stack = getStackByAmbari(ambariAddress)
-        if (stack) {
-            if (stack.owner == userId) {
-                return true
-            } else if (stack.public && stack.account == account) {
-                return true
-            }
-            return false
+        if (stack.owner == userId) {
+            return true
+        } else if (stack.public && stack.account == account) {
+            return true
         }
-        return false
     }
 
-    def int resolveToStackId(String ambariAddress) {
+    def int resolveToStackId(String ambariAddress) throws HttpResponseException {
         getStackByAmbari(ambariAddress)?.id
     }
 
