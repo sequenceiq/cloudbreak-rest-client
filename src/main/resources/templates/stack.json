@@ -3,5 +3,6 @@
    "templateId":$TEMPLATE_ID,
    "name":"$STACK_NAME",
    "credentialId":$CREDENTIAL_ID,
+   "userName":$USER_NAME,
    "password":$PASSWORD
 }
