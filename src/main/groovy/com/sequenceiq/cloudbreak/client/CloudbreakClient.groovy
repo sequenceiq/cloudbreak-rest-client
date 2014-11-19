@@ -71,9 +71,13 @@ class CloudbreakClient {
         restClient.headers['Authorization'] = 'Bearer ' + token
     }
 
-    def String postStack(String stackName, String nodeCount, String credentialId, String templateId, Boolean publicInAccount) throws Exception {
+    def String postStack(String stackName, String password, String nodeCount, String credentialId, String templateId, Boolean publicInAccount) throws Exception {
         log.debug("Posting stack ...")
-        def binding = ["NODE_COUNT": nodeCount, "STACK_NAME": stackName, "CREDENTIAL_ID": credentialId, "TEMPLATE_ID": templateId]
+        def binding = ["NODE_COUNT"   : nodeCount,
+                       "STACK_NAME"   : stackName,
+                       "CREDENTIAL_ID": credentialId,
+                       "TEMPLATE_ID"  : templateId,
+                       "PASSWORD"     : password]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_STACKS, binding)
