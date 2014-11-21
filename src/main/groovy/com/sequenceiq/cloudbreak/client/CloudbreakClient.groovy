@@ -214,21 +214,17 @@ class CloudbreakClient {
         doPost(context)?.data
     }
 
-    def int putCluster(String ambari, Map<String, Integer> hostGroupAssociations) throws Exception {
+    def int putCluster(String ambari, String hostGroup, int scalingAdjustment) throws Exception {
         def stackId = getStackId(ambari)
         if (stackId) {
-            putCluster(stackId, hostGroupAssociations);
+            putCluster(stackId, hostGroup, scalingAdjustment);
         }
         stackId
     }
 
-    def void putCluster(int stackId, Map<String, Integer> hostGroupAssociations) throws Exception {
+    def void putCluster(int stackId, String hostGroup, int scalingAdjustment) throws Exception {
         log.debug("Putting cluster ...")
-        def hostGroups = []
-        hostGroupAssociations.each {
-            hostGroups << ["hostGroup": it.key, "scalingAdjustment": it.value]
-        }
-        def binding = ["HOST_GROUPS": new JsonBuilder(hostGroups).toPrettyString()]
+        def binding = ["HOST_GROUPS": new JsonBuilder(["hostGroup": hostGroup, "scalingAdjustment": scalingAdjustment]).toPrettyString()]
         def json = createJson(Resource.CLUSTER_NODECOUNT_PUT.template(), binding)
         String path = Resource.CLUSTER_NODECOUNT_PUT.path().replaceFirst("stack-id", stackId.toString())
         def Map putCtx = createPostRequestContext(path, ['json': json])
