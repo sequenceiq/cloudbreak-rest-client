@@ -126,9 +126,9 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postAzureCredential(String name, String description, String subscriptionId, String jksPassword, String sshKey, Boolean publicInAccount) throws Exception {
+    def String postAzureCredential(String name, String description, String subscriptionId, String sshKey, Boolean publicInAccount) throws Exception {
         log.debug("Posting credential ...")
-        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "SUBSCRIPTIONID": subscriptionId, "JKSPASSWORD": jksPassword, "SSHKEY": sshKey]
+        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "SUBSCRIPTIONID": subscriptionId, "SSHKEY": sshKey]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_CREDENTIALS_AZURE, binding)
