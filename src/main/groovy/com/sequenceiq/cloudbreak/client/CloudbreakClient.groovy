@@ -151,7 +151,7 @@ class CloudbreakClient {
         return getOne(Resource.CERTIFICATE, id).text
     }
 
-    def String postSpotEc2Template(String name, String description, String region, String amiId, String sshLocation, String instanceType, String volumeCount, String volumeSize, String volumeType, String spotPrice, Boolean publicInAccount) throws Exception {
+    def String postSpotEc2Template(String name, String description, String sshLocation, String instanceType, String volumeCount, String volumeSize, String volumeType, String spotPrice, Boolean publicInAccount) throws Exception {
         log.debug("testing credential ...")
         def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "SSH_LOCATION": sshLocation, "INSTANCE_TYPE": instanceType, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "VOLUME_TYPE": volumeType, "SPOT_PRICE": spotPrice]
         def response;
