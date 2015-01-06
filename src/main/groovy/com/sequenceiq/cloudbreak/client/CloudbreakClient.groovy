@@ -44,7 +44,9 @@ class CloudbreakClient {
         GLOBAL_BLUEPRINTS("blueprints", "blueprint.json"),
         CLUSTER_NODECOUNT_PUT("stacks/stack-id/cluster", "cluster_nodecount_put.json"),
         CLUSTERS("stacks/stack-id/cluster", "cluster.json"),
-        CERTIFICATES("credentials/certificate", "certificate.json")
+        CERTIFICATES("credentials/certificate", "certificate.json"),
+        ACCOUNT_RECIPES("account/recipes", "recipe.json"),
+        USER_RECIPES("user/recipes", "recipe.json")
 
         def path
         def template
@@ -125,6 +127,19 @@ class CloudbreakClient {
             response = processPost(Resource.ACCOUNT_BLUEPRINTS, binding)
         } else {
             response = processPost(Resource.USER_BLUEPRINTS, binding)
+        }
+        log.debug("Got response: {}", response.data.id)
+        return response?.data?.id
+    }
+
+    def String postRecipe(String recipe, Boolean publicInAccount) throws Exception {
+        log.debug("Posting recipe to account...")
+        def binding = ["RECIPE": recipe]
+        def response;
+        if (publicInAccount) {
+            response = processPost(Resource.ACCOUNT_RECIPES, binding)
+        } else {
+            response = processPost(Resource.USER_RECIPES, binding)
         }
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
