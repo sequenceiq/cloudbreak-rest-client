@@ -1,5 +1,6 @@
 {
    "name":"$NAME",
    "blueprintId":$BLUEPRINT_ID,
+   "recipeId":$RECIPE_ID,
    "description":"$DESCRIPTION"
 }

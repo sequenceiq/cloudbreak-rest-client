@@ -46,7 +46,8 @@ class CloudbreakClient {
         CLUSTERS("stacks/stack-id/cluster", "cluster.json"),
         CERTIFICATES("credentials/certificate", "certificate.json"),
         ACCOUNT_RECIPES("account/recipes", "recipe.json"),
-        USER_RECIPES("user/recipes", "recipe.json")
+        USER_RECIPES("user/recipes", "recipe.json"),
+        GLOBAL_RECIPES("recipes", "")
 
         def path
         def template
@@ -289,9 +290,9 @@ class CloudbreakClient {
         doPut(putCtx)
     }
 
-    def void postCluster(String name, Integer blueprintId, String description, Integer stackId) throws Exception {
+    def void postCluster(String name, Integer blueprintId, Integer recipeId, String description, Integer stackId) throws Exception {
         log.debug("Posting cluster ...")
-        def binding = ["NAME": name, "BLUEPRINT_ID": blueprintId, "DESCRIPTION": description]
+        def binding = ["NAME": name, "BLUEPRINT_ID": blueprintId, "RECIPE_ID": recipeId, "DESCRIPTION": description]
         def json = createJson(Resource.CLUSTERS.template(), binding)
         String path = Resource.CLUSTERS.path().replaceFirst("stack-id", stackId.toString())
         def Map postCtx = createPostRequestContext(path, ['json': json])
@@ -379,6 +380,22 @@ class CloudbreakClient {
                     [(it.key as String): it.value as String]
                 }
             } else if (it.key == "ambariBlueprint") {
+                def result = it.value.host_groups?.collectEntries { [(it.name): it.components.collect { it.name }] }
+                [(it.key as String): result as Map]
+            } else {
+                [(it.key as String): it.value as String]
+            }
+        }
+        result ?: new HashMap()
+    }
+
+    def Map<String, String> getRecipeMap(String id) throws Exception {
+        def result = getRecipe(id)?.collectEntries {
+            if (it.key == "plugins") {
+//                it.value.collectEntries {
+//                    [(it.key as String): it.value as String]
+//                }
+            } else if (it.key == "blueprint") {
                 def result = it.value.host_groups?.collectEntries { [(it.name): it.components.collect { it.name }] }
                 [(it.key as String): result as Map]
             } else {
@@ -539,8 +556,13 @@ class CloudbreakClient {
     }
 
     def Object getBlueprint(String id) throws Exception {
-        log.debug("Getting credentials...")
+        log.debug("Getting blueprint...")
         return getOne(Resource.GLOBAL_BLUEPRINTS, id)
+    }
+
+    def Object getRecipe(String id) throws Exception {
+        log.debug("Getting recipe...")
+        return getOne(Resource.GLOBAL_RECIPES, id)
     }
 
     def Object terminateStack(String id) throws Exception {
