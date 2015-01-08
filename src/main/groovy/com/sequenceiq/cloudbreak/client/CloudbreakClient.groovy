@@ -268,7 +268,6 @@ class CloudbreakClient {
         postBlueprint("multi-node-hdfs-yarn", "multi-node-hdfs-yarn", getResourceContent("blueprints/multi-node-hdfs-yarn"), false)
         postBlueprint("hdp-multinode-default", "hdp-multinode-default", getResourceContent("blueprints/hdp-multinode-default"), false)
         postBlueprint("lambda-architecture", "lambda-architecture", getResourceContent("blueprints/lambda-architecture"), false)
-        postBlueprint("warmup", "warmup", getResourceContent("blueprints/warmup"), false)
     }
 
     def boolean health() throws Exception {
