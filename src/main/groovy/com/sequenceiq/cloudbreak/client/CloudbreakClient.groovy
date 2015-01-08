@@ -266,9 +266,8 @@ class CloudbreakClient {
 
     def void addDefaultBlueprints() throws HttpResponseException {
         postBlueprint("multi-node-hdfs-yarn", "multi-node-hdfs-yarn", getResourceContent("blueprints/multi-node-hdfs-yarn"), false)
-        postBlueprint("single-node-hdfs-yarn", "single-node-hdfs-yarn", getResourceContent("blueprints/single-node-hdfs-yarn"), false)
+        postBlueprint("hdp-multinode-default", "hdp-multinode-default", getResourceContent("blueprints/hdp-multinode-default"), false)
         postBlueprint("lambda-architecture", "lambda-architecture", getResourceContent("blueprints/lambda-architecture"), false)
-        postBlueprint("warmup", "warmup", getResourceContent("blueprints/warmup"), false)
     }
 
     def boolean health() throws Exception {
@@ -585,4 +584,3 @@ class CloudbreakClient {
         getPrivateStacks().find { it.ambariServerIp.equals(ambari) }?.id
     }
 }
-
