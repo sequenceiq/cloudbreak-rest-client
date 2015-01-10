@@ -78,7 +78,8 @@ class CloudbreakClient {
                        "CREDENTIAL_ID": credentialId,
                        "TEMPLATE_ID"  : templateId,
                        "USER_NAME"    : userName,
-                       "PASSWORD"     : password]
+                       "PASSWORD"     : password,
+                       "PUBLIC_IN_ACCOUNT": publicInAccount]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_STACKS, binding)
@@ -91,7 +92,7 @@ class CloudbreakClient {
 
     def String postBlueprint(String name, String description, String blueprint, Boolean publicInAccount) throws Exception {
         log.debug("Posting blueprint ...")
-        def binding = ["BLUEPRINT": blueprint, "NAME": name, "DESCRIPTION": description]
+        def binding = ["BLUEPRINT": blueprint, "NAME": name, "DESCRIPTION": description, "PUBLIC_IN_ACCOUNT": publicInAccount]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_BLUEPRINTS, binding)
@@ -104,7 +105,7 @@ class CloudbreakClient {
 
     def String postEc2Credential(String name, String description, String roleArn, String sshKey, Boolean publicInAccount) throws Exception {
         log.debug("Posting credential ...")
-        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "ROLE_ARN": roleArn, "DESCRIPTION": description, "SSHKEY": sshKey]
+        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "ROLE_ARN": roleArn, "DESCRIPTION": description, "SSHKEY": sshKey, "PUBLIC_IN_ACCOUNT": publicInAccount]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_CREDENTIALS_EC2, binding)
@@ -116,7 +117,7 @@ class CloudbreakClient {
 
     def String postGccCredential(String name, String description, String sshKey, Boolean publicInAccount, String projectId, String serviceAccountId, String serviceAccountPrivateKey) throws Exception {
         log.debug("Posting credential ...")
-        def binding = ["CLOUD_PLATFORM": "GCC", "NAME": name, "PROJECT_ID": projectId, "DESCRIPTION": description, "SSHKEY": sshKey, "SERVICE_ACCOUNT_ID": serviceAccountId, "SERVICE_ACCOUNT_PRIVATE_KEY": serviceAccountPrivateKey]
+        def binding = ["CLOUD_PLATFORM": "GCC", "NAME": name, "PROJECT_ID": projectId, "DESCRIPTION": description, "SSHKEY": sshKey, "SERVICE_ACCOUNT_ID": serviceAccountId, "SERVICE_ACCOUNT_PRIVATE_KEY": serviceAccountPrivateKey, "PUBLIC_IN_ACCOUNT": publicInAccount]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_CREDENTIALS_GCC, binding)
@@ -128,7 +129,7 @@ class CloudbreakClient {
 
     def String postAzureCredential(String name, String description, String subscriptionId, String sshKey, Boolean publicInAccount) throws Exception {
         log.debug("Posting credential ...")
-        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "SUBSCRIPTIONID": subscriptionId, "SSHKEY": sshKey]
+        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "SUBSCRIPTIONID": subscriptionId, "SSHKEY": sshKey, "PUBLIC_IN_ACCOUNT": publicInAccount]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_CREDENTIALS_AZURE, binding)
@@ -145,7 +146,7 @@ class CloudbreakClient {
 
     def String postSpotEc2Template(String name, String description, String region, String amiId, String sshLocation, String instanceType, String volumeCount, String volumeSize, String volumeType, String spotPrice, Boolean publicInAccount) throws Exception {
         log.debug("testing credential ...")
-        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "REGION": region, "AMI": amiId, "SSH_LOCATION": sshLocation, "INSTANCE_TYPE": instanceType, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "VOLUME_TYPE": volumeType, "SPOT_PRICE": spotPrice]
+        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "REGION": region, "AMI": amiId, "SSH_LOCATION": sshLocation, "INSTANCE_TYPE": instanceType, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "VOLUME_TYPE": volumeType, "SPOT_PRICE": spotPrice, "PUBLIC_IN_ACCOUNT": publicInAccount]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_TEMPLATES_EC2_SPOT, binding)
@@ -158,7 +159,7 @@ class CloudbreakClient {
 
     def String postEc2Template(String name, String description, String region, String amiId, String sshLocation, String instanceType, String volumeCount, String volumeSize, String volumeType, Boolean publicInAccount) throws Exception {
         log.debug("testing credential ...")
-        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "REGION": region, "AMI": amiId, "SSH_LOCATION": sshLocation, "INSTANCE_TYPE": instanceType, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "VOLUME_TYPE": volumeType]
+        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "REGION": region, "AMI": amiId, "SSH_LOCATION": sshLocation, "INSTANCE_TYPE": instanceType, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "VOLUME_TYPE": volumeType, "PUBLIC_IN_ACCOUNT": publicInAccount]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_TEMPLATES_EC2, binding)
@@ -171,7 +172,7 @@ class CloudbreakClient {
 
     def String postGccTemplate(String name, String description, String imageName, String gccInstanceType, String volumeCount, String volumeSize, String gccZone, Boolean publicInAccount) throws Exception {
         log.debug("testing credential ...")
-        def binding = ["CLOUD_PLATFORM": "GCC", "GCC_IMAGE_TYPE": imageName, "NAME": name, "GCC_ZONE": gccZone, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "GCC_INSTANCE_TYPE": gccInstanceType]
+        def binding = ["CLOUD_PLATFORM": "GCC", "GCC_IMAGE_TYPE": imageName, "NAME": name, "GCC_ZONE": gccZone, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "GCC_INSTANCE_TYPE": gccInstanceType, "PUBLIC_IN_ACCOUNT": publicInAccount]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_TEMPLATES_GCC, binding)
@@ -184,7 +185,7 @@ class CloudbreakClient {
 
     def String postAzureTemplate(String name, String description, String region, String instanceName, String instanceType, String volumeCount, String volumeSize, Boolean publicInAccount) throws Exception {
         log.debug("testing credential ...")
-        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "IMAGE_NAME": instanceName, "REGION": region, "INSTANCE_TYPE": instanceType, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize]
+        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "IMAGE_NAME": instanceName, "REGION": region, "INSTANCE_TYPE": instanceType, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "PUBLIC_IN_ACCOUNT": publicInAccount]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_TEMPLATES_AZURE, binding)
