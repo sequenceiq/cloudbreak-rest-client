@@ -1,5 +1,6 @@
 {
     "ambariBlueprint" : $BLUEPRINT,
     "name" : "$NAME",
-    "description": "$DESCRIPTION"
+    "description": "$DESCRIPTION",
+    "public": $PUBLIC_IN_ACCOUNT
 }

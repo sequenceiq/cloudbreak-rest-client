@@ -4,5 +4,6 @@
    "name":"$STACK_NAME",
    "credentialId":$CREDENTIAL_ID,
    "userName":"$USER_NAME",
-   "password":"$PASSWORD"
+   "password":"$PASSWORD",
+   "public": $PUBLIC_IN_ACCOUNT
 }

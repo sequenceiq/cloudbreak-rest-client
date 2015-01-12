@@ -4,6 +4,7 @@
     "description": "$DESCRIPTION",
     "volumeCount": "$VOLUME_COUNT",
     "volumeSize": "$VOLUME_SIZE",
+    "public": $PUBLIC_IN_ACCOUNT,
     "parameters": {
         "gccZone": "$GCC_ZONE",
         "gccInstanceType": "$GCC_INSTANCE_TYPE",
