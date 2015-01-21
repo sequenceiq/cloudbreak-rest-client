@@ -401,14 +401,16 @@ class CloudbreakClient {
         result ?: new HashMap()
     }
 
-    def Map<String, String> getRecipeMap(String id) throws Exception {
+    def Map<String, Object> getRecipeMap(String id) throws Exception {
         def result = getRecipe(id)?.collectEntries {
             if (it.key == "plugins") {
-//                it.value.collectEntries {
-//                    [(it.key as String): it.value as String]
-//                }
+                def result = it.value.collectEntries { [(it.url): it.parameters.collect { it }] }
+                [(it.key as String): result as Map]
             } else if (it.key == "blueprint") {
                 def result = it.value.host_groups?.collectEntries { [(it.name): it.components.collect { it.name }] }
+                [(it.key as String): result as Map]
+            } else if (it.key == "keyvalues") {
+                def result = it.value.collectEntries { [(it.key): it.value] }
                 [(it.key as String): result as Map]
             } else {
                 [(it.key as String): it.value as String]
