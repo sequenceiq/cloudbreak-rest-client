@@ -373,6 +373,18 @@ class CloudbreakClient {
         result ?: new HashMap()
     }
 
+    def List<Map> getAccountRecipes() throws Exception {
+        log.debug("Getting recipes...")
+        getAllAsList(Resource.ACCOUNT_RECIPES)
+    }
+
+    def Map<String, String> getAccountRecipesMap() throws Exception {
+        def result = getAccountRecipes()?.collectEntries {
+            [(it.id as String): it.name]
+        }
+        result ?: new HashMap()
+    }
+
     def Map<String, Object> getBlueprintMap(String id) throws Exception {
         def result = getBlueprint(id)?.collectEntries {
             if (it.key == "parameters") {
