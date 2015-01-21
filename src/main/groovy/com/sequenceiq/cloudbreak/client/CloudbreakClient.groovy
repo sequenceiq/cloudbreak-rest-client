@@ -553,6 +553,11 @@ class CloudbreakClient {
         return deleteOne(Resource.GLOBAL_BLUEPRINTS, id)
     }
 
+    def Object deleteRecipe(String id) throws Exception {
+        log.debug("Delete recipe...")
+        return deleteOne(Resource.GLOBAL_RECIPES, id)
+    }
+
     def Object getCluster(String id) throws Exception {
         log.debug("Getting cluster...")
         String path = Resource.CLUSTERS.path().replaceFirst("stack-id", id.toString())
