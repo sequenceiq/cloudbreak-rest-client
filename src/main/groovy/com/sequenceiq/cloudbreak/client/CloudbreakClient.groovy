@@ -82,11 +82,11 @@ class CloudbreakClient {
 
         def binding = ["STACK_NAME"   : stackName,
                        "CREDENTIAL_ID": credentialId,
-                       "REGION"  : region,
+                       "REGION"       : region,
                        "USER_NAME"    : userName,
                        "PASSWORD"     : password,
                        "PUBLIC_IN_ACCOUNT": publicInAccount,
-                       "GROUP" : group.toString().substring(0, group.toString().length() - 1)]
+                       "GROUP"        : group.toString().substring(0, group.toString().length() - 1)]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_STACKS, binding)
@@ -246,19 +246,10 @@ class CloudbreakClient {
         resp?.data?.status
     }
 
-    def int putStack(String ambari, int scalingAdjustment) throws Exception {
-        def stackId = getStackId(ambari)
-        if (stackId) {
-            putStack(stackId, scalingAdjustment)
-        }
-        stackId
-    }
-
-    def void putStack(int id, int scalingAdjustment) throws Exception {
-        log.debug("Putting stack ...")
-        def binding = ["NODE_COUNT": scalingAdjustment]
+    def void putStack(int stackId, String hostGroup, int adjustment) {
+        def binding = ["HOST_GROUP": hostGroup, "ADJUSTMENT": adjustment]
         def json = createJson(Resource.GLOBAL_STACKS_NODECOUNT_PUT.template(), binding)
-        String path = Resource.GLOBAL_STACKS_NODECOUNT_PUT.path() + "/$id"
+        String path = Resource.GLOBAL_STACKS_NODECOUNT_PUT.path() + "/$stackId"
         def Map putCtx = createPostRequestContext(path, ['json': json])
         doPut(putCtx)
     }
