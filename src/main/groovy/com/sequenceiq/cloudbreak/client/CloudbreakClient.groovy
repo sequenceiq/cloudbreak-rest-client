@@ -76,7 +76,7 @@ class CloudbreakClient {
         StringBuilder group = new StringBuilder();
         hostGroupTemplates.entrySet().each { Map.Entry<String, Integer> entry ->
             group.append("{");
-            group.append(String.format("\"templateId\": \"%s\", \"group\": \"%s\", \"nodeCount\": \"%s\"", ((Map.Entry) entry.getValue()).key, entry.getKey(), ((Map.Entry) entry.getValue()).value));
+            group.append(String.format("\"templateId\": \"%s\", \"groupName\": \"%s\", \"nodeCount\": \"%s\"", ((Map.Entry) entry.getValue()).key, entry.getKey(), ((Map.Entry) entry.getValue()).value));
             group.append("},");
         }
 
