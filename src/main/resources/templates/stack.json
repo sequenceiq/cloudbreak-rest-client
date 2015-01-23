@@ -1,9 +1,9 @@
 {
-   "nodeCount":$NODE_COUNT,
-   "templateId":$TEMPLATE_ID,
    "name":"$STACK_NAME",
    "credentialId":$CREDENTIAL_ID,
+   "region": "$REGION",
    "userName":"$USER_NAME",
    "password":"$PASSWORD",
    "public": $PUBLIC_IN_ACCOUNT
+   "instanceGroups": [$GROUPS]
 }

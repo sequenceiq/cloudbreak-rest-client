@@ -1,3 +1,6 @@
 {
-    "scalingAdjustment":$NODE_COUNT
+    "hostGroupAdjustment": {
+        "hostGroup": "$HOST_GROUP",
+        "scalingAdjustment": $ADJUSTMENT
+    }
 }
