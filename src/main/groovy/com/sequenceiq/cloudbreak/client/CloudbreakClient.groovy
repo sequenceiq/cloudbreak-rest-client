@@ -177,9 +177,9 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postGccTemplate(String name, String description, String imageName, String gccInstanceType, String volumeCount, String volumeSize, String gccZone, Boolean publicInAccount) throws Exception {
+    def String postGccTemplate(String name, String description, String gccInstanceType, String volumeCount, String volumeSize, Boolean publicInAccount) throws Exception {
         log.debug("testing credential ...")
-        def binding = ["CLOUD_PLATFORM": "GCC", "GCC_IMAGE_TYPE": imageName, "NAME": name, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "GCC_INSTANCE_TYPE": gccInstanceType]
+        def binding = ["CLOUD_PLATFORM": "GCC", "NAME": name, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "GCC_INSTANCE_TYPE": gccInstanceType]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_TEMPLATES_GCC, binding)
@@ -190,7 +190,7 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postAzureTemplate(String name, String description, String region, String instanceName, String instanceType, String volumeCount, String volumeSize, Boolean publicInAccount) throws Exception {
+    def String postAzureTemplate(String name, String description, String instanceType, String volumeCount, String volumeSize, Boolean publicInAccount) throws Exception {
         log.debug("testing credential ...")
         def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "IMAGE_NAME": instanceName, "INSTANCE_TYPE": instanceType, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize]
         def response;
