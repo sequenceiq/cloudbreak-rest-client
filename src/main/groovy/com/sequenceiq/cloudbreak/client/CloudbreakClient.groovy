@@ -71,13 +71,15 @@ class CloudbreakClient {
         restClient.headers['Authorization'] = 'Bearer ' + token
     }
 
-    def String postStack(String stackName, String userName, String password, String credentialId, String region, Boolean publicInAccount, Map<String, Map.Entry<Long, Integer>> hostGroupTemplates) throws Exception {
+    def String postStack(String stackName, String userName, String password, String credentialId, String region, Boolean publicInAccount, Map<String, Map<Long, Integer>> hostGroupTemplates) throws Exception {
         log.debug("Posting stack ...")
         StringBuilder group = new StringBuilder();
-        hostGroupTemplates.entrySet().each { Map.Entry<String, Integer> entry ->
-            group.append("{");
-            group.append(String.format("\"templateId\": \"%s\", \"groupName\": \"%s\", \"nodeCount\": \"%s\"", ((Map.Entry) entry.getValue()).key, entry.getKey(), ((Map.Entry) entry.getValue()).value));
-            group.append("},");
+        for (Map.Entry<String, Map<Long, Integer>> map: hostGroupTemplates.entrySet()) {
+            for (Map.Entry<Long, Integer> entry : map.value.entrySet()) {
+                group.append("{");
+                group.append(String.format("\"templateId\": %s, \"group\": \"%s\", \"nodeCount\": %s", entry.getKey(), map.getKey(), entry.getValue()));
+                group.append("},");
+            }
         }
 
         def binding = ["STACK_NAME"   : stackName,
@@ -85,8 +87,7 @@ class CloudbreakClient {
                        "REGION"       : region,
                        "USER_NAME"    : userName,
                        "PASSWORD"     : password,
-                       "PUBLIC_IN_ACCOUNT": publicInAccount,
-                       "GROUP"        : group.toString().substring(0, group.toString().length() - 1)]
+                       "GROUPS"        : group.toString().substring(0, group.toString().length() - 1)]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_STACKS, binding)
@@ -373,6 +374,28 @@ class CloudbreakClient {
     def Map<String, String> getAccountTemplatesMap() throws Exception {
         def result = getAccountTemplates()?.collectEntries {
             [(it.id as String): it.name + ":" + it.description]
+        }
+        result ?: new HashMap()
+    }
+
+    def Map<String, Map<String, String>> getAccountTemplatesWithCloudPlatformMap(String cloudPlatform = "") throws Exception {
+        def templates = getAccountTemplates()
+        def result
+        if(cloudPlatform == "") {
+            result = templates?.collectEntries {
+                Map<String, String> inside = new HashMap<>()
+                inside.put(it.name as String, it.cloudPlatform as String)
+                [(it.id as String): inside]
+            }
+        } else {
+            result = new HashMap<>()
+            for (Map map : templates) {
+                if ((map.cloudPlatform as String) == cloudPlatform) {
+                    Map<String, String> inside = new HashMap<>()
+                    inside.put(map.name as String, map.cloudPlatform as String)
+                    result.put((map.id as String), inside)
+                }
+            }
         }
         result ?: new HashMap()
     }
