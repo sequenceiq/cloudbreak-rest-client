@@ -100,7 +100,7 @@ class CloudbreakClient {
 
     def String postBlueprint(String name, String description, String blueprint, Boolean publicInAccount) throws Exception {
         log.debug("Posting blueprint ...")
-        def binding = ["BLUEPRINT": blueprint, "NAME": name, "DESCRIPTION": description, "PUBLIC_IN_ACCOUNT": publicInAccount]
+        def binding = ["BLUEPRINT": blueprint, "NAME": name, "DESCRIPTION": description]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_BLUEPRINTS, binding)
@@ -113,7 +113,7 @@ class CloudbreakClient {
 
     def String postEc2Credential(String name, String description, String roleArn, String sshKey, Boolean publicInAccount) throws Exception {
         log.debug("Posting credential ...")
-        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "ROLE_ARN": roleArn, "DESCRIPTION": description, "SSHKEY": sshKey, "PUBLIC_IN_ACCOUNT": publicInAccount]
+        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "ROLE_ARN": roleArn, "DESCRIPTION": description, "SSHKEY": sshKey]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_CREDENTIALS_EC2, binding)
@@ -125,7 +125,7 @@ class CloudbreakClient {
 
     def String postGccCredential(String name, String description, String sshKey, Boolean publicInAccount, String projectId, String serviceAccountId, String serviceAccountPrivateKey) throws Exception {
         log.debug("Posting credential ...")
-        def binding = ["CLOUD_PLATFORM": "GCC", "NAME": name, "PROJECT_ID": projectId, "DESCRIPTION": description, "SSHKEY": sshKey, "SERVICE_ACCOUNT_ID": serviceAccountId, "SERVICE_ACCOUNT_PRIVATE_KEY": serviceAccountPrivateKey, "PUBLIC_IN_ACCOUNT": publicInAccount]
+        def binding = ["CLOUD_PLATFORM": "GCC", "NAME": name, "PROJECT_ID": projectId, "DESCRIPTION": description, "SSHKEY": sshKey, "SERVICE_ACCOUNT_ID": serviceAccountId, "SERVICE_ACCOUNT_PRIVATE_KEY": serviceAccountPrivateKey]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_CREDENTIALS_GCC, binding)
@@ -137,7 +137,7 @@ class CloudbreakClient {
 
     def String postAzureCredential(String name, String description, String subscriptionId, String sshKey, Boolean publicInAccount) throws Exception {
         log.debug("Posting credential ...")
-        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "SUBSCRIPTIONID": subscriptionId, "SSHKEY": sshKey, "PUBLIC_IN_ACCOUNT": publicInAccount]
+        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "SUBSCRIPTIONID": subscriptionId, "SSHKEY": sshKey]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_CREDENTIALS_AZURE, binding)
