@@ -87,7 +87,7 @@ class CloudbreakClient {
                        "REGION"       : region,
                        "USER_NAME"    : userName,
                        "PASSWORD"     : password,
-                       "GROUPS"        : group.toString().substring(0, group.toString().length() - 1)]
+                       "GROUPS"       : group.toString().substring(0, group.toString().length() - 1)]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_STACKS, binding)
@@ -193,7 +193,7 @@ class CloudbreakClient {
 
     def String postAzureTemplate(String name, String description, String instanceType, String volumeCount, String volumeSize, Boolean publicInAccount) throws Exception {
         log.debug("testing credential ...")
-        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "IMAGE_NAME": instanceName, "INSTANCE_TYPE": instanceType, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize]
+        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "INSTANCE_TYPE": instanceType, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_TEMPLATES_AZURE, binding)
