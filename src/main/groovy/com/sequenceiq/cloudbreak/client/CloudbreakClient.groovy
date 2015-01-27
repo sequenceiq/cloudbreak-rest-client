@@ -71,13 +71,15 @@ class CloudbreakClient {
         restClient.headers['Authorization'] = 'Bearer ' + token
     }
 
-    def String postStack(String stackName, String userName, String password, String credentialId, String region, Boolean publicInAccount, Map<String, Map.Entry<Long, Integer>> hostGroupTemplates) throws Exception {
+    def String postStack(String stackName, String userName, String password, String credentialId, String region, Boolean publicInAccount, Map<String, Map<Long, Integer>> hostGroupTemplates) throws Exception {
         log.debug("Posting stack ...")
         StringBuilder group = new StringBuilder();
-        hostGroupTemplates.entrySet().each { Map.Entry<String, Integer> entry ->
-            group.append("{");
-            group.append(String.format("\"templateId\": \"%s\", \"groupName\": \"%s\", \"nodeCount\": \"%s\"", ((Map.Entry) entry.getValue()).key, entry.getKey(), ((Map.Entry) entry.getValue()).value));
-            group.append("},");
+        for (Map.Entry<String, Map<Long, Integer>> map: hostGroupTemplates.entrySet()) {
+            for (Map.Entry<Long, Integer> entry : map.value.entrySet()) {
+                group.append("{");
+                group.append(String.format("\"templateId\": %s, \"group\": \"%s\", \"nodeCount\": %s", entry.getKey(), map.getKey(), entry.getValue()));
+                group.append("},");
+            }
         }
 
         def binding = ["STACK_NAME"   : stackName,
@@ -85,8 +87,7 @@ class CloudbreakClient {
                        "REGION"       : region,
                        "USER_NAME"    : userName,
                        "PASSWORD"     : password,
-                       "PUBLIC_IN_ACCOUNT": publicInAccount,
-                       "GROUP"        : group.toString().substring(0, group.toString().length() - 1)]
+                       "GROUPS"       : group.toString().substring(0, group.toString().length() - 1)]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_STACKS, binding)
@@ -99,7 +100,7 @@ class CloudbreakClient {
 
     def String postBlueprint(String name, String description, String blueprint, Boolean publicInAccount) throws Exception {
         log.debug("Posting blueprint ...")
-        def binding = ["BLUEPRINT": blueprint, "NAME": name, "DESCRIPTION": description, "PUBLIC_IN_ACCOUNT": publicInAccount]
+        def binding = ["BLUEPRINT": blueprint, "NAME": name, "DESCRIPTION": description]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_BLUEPRINTS, binding)
@@ -112,7 +113,7 @@ class CloudbreakClient {
 
     def String postEc2Credential(String name, String description, String roleArn, String sshKey, Boolean publicInAccount) throws Exception {
         log.debug("Posting credential ...")
-        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "ROLE_ARN": roleArn, "DESCRIPTION": description, "SSHKEY": sshKey, "PUBLIC_IN_ACCOUNT": publicInAccount]
+        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "ROLE_ARN": roleArn, "DESCRIPTION": description, "SSHKEY": sshKey]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_CREDENTIALS_EC2, binding)
@@ -124,7 +125,7 @@ class CloudbreakClient {
 
     def String postGccCredential(String name, String description, String sshKey, Boolean publicInAccount, String projectId, String serviceAccountId, String serviceAccountPrivateKey) throws Exception {
         log.debug("Posting credential ...")
-        def binding = ["CLOUD_PLATFORM": "GCC", "NAME": name, "PROJECT_ID": projectId, "DESCRIPTION": description, "SSHKEY": sshKey, "SERVICE_ACCOUNT_ID": serviceAccountId, "SERVICE_ACCOUNT_PRIVATE_KEY": serviceAccountPrivateKey, "PUBLIC_IN_ACCOUNT": publicInAccount]
+        def binding = ["CLOUD_PLATFORM": "GCC", "NAME": name, "PROJECT_ID": projectId, "DESCRIPTION": description, "SSHKEY": sshKey, "SERVICE_ACCOUNT_ID": serviceAccountId, "SERVICE_ACCOUNT_PRIVATE_KEY": serviceAccountPrivateKey]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_CREDENTIALS_GCC, binding)
@@ -136,7 +137,7 @@ class CloudbreakClient {
 
     def String postAzureCredential(String name, String description, String subscriptionId, String sshKey, Boolean publicInAccount) throws Exception {
         log.debug("Posting credential ...")
-        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "SUBSCRIPTIONID": subscriptionId, "SSHKEY": sshKey, "PUBLIC_IN_ACCOUNT": publicInAccount]
+        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "SUBSCRIPTIONID": subscriptionId, "SSHKEY": sshKey]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_CREDENTIALS_AZURE, binding)
@@ -177,9 +178,9 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postGccTemplate(String name, String description, String imageName, String gccInstanceType, String volumeCount, String volumeSize, String gccZone, Boolean publicInAccount) throws Exception {
+    def String postGccTemplate(String name, String description, String gccInstanceType, String volumeCount, String volumeSize, Boolean publicInAccount) throws Exception {
         log.debug("testing credential ...")
-        def binding = ["CLOUD_PLATFORM": "GCC", "GCC_IMAGE_TYPE": imageName, "NAME": name, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "GCC_INSTANCE_TYPE": gccInstanceType]
+        def binding = ["CLOUD_PLATFORM": "GCC", "NAME": name, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "GCC_INSTANCE_TYPE": gccInstanceType]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_TEMPLATES_GCC, binding)
@@ -190,9 +191,9 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postAzureTemplate(String name, String description, String region, String instanceName, String instanceType, String volumeCount, String volumeSize, Boolean publicInAccount) throws Exception {
+    def String postAzureTemplate(String name, String description, String instanceType, String volumeCount, String volumeSize, Boolean publicInAccount) throws Exception {
         log.debug("testing credential ...")
-        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "IMAGE_NAME": instanceName, "INSTANCE_TYPE": instanceType, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize]
+        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "INSTANCE_TYPE": instanceType, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_TEMPLATES_AZURE, binding)
@@ -373,6 +374,28 @@ class CloudbreakClient {
     def Map<String, String> getAccountTemplatesMap() throws Exception {
         def result = getAccountTemplates()?.collectEntries {
             [(it.id as String): it.name + ":" + it.description]
+        }
+        result ?: new HashMap()
+    }
+
+    def Map<String, Map<String, String>> getAccountTemplatesWithCloudPlatformMap(String cloudPlatform = "") throws Exception {
+        def templates = getAccountTemplates()
+        def result
+        if(cloudPlatform == "") {
+            result = templates?.collectEntries {
+                Map<String, String> inside = new HashMap<>()
+                inside.put(it.name as String, it.cloudPlatform as String)
+                [(it.id as String): inside]
+            }
+        } else {
+            result = new HashMap<>()
+            for (Map map : templates) {
+                if ((map.cloudPlatform as String) == cloudPlatform) {
+                    Map<String, String> inside = new HashMap<>()
+                    inside.put(map.name as String, map.cloudPlatform as String)
+                    result.put((map.id as String), inside)
+                }
+            }
         }
         result ?: new HashMap()
     }
