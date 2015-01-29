@@ -34,6 +34,8 @@ class CloudbreakClient {
         GLOBAL_TEMPLATES("templates", ""),
         USER_STACKS("user/stacks", "stack.json"),
         ACCOUNT_STACKS("account/stacks", "stack.json"),
+        ACCOUNT_STACKS_WITH_IMAGE("account/stacks", "stackimage.json"),
+        USER_STACKS_WITH_IMAGE("user/stacks", "stackimage.json"),
         GLOBAL_STACKS_NODECOUNT_PUT("stacks", "stack_nodecount_put.json"),
         GLOBAL_STACKS("stacks", ""),
         STACK_AMBARI("stacks/ambari", ""),
@@ -71,7 +73,7 @@ class CloudbreakClient {
         restClient.headers['Authorization'] = 'Bearer ' + token
     }
 
-    def String postStack(String stackName, String userName, String password, String credentialId, String region, Boolean publicInAccount, Map<String, Map<Long, Integer>> hostGroupTemplates) throws Exception {
+    def String postStack(String stackName, String userName, String password, String credentialId, String region, Boolean publicInAccount, Map<String, Map<Long, Integer>> hostGroupTemplates, String image = null) throws Exception {
         log.debug("Posting stack ...")
         StringBuilder group = new StringBuilder();
         for (Map.Entry<String, Map<Long, Integer>> map: hostGroupTemplates.entrySet()) {
@@ -81,19 +83,36 @@ class CloudbreakClient {
                 group.append("},");
             }
         }
-
-        def binding = ["STACK_NAME"   : stackName,
-                       "CREDENTIAL_ID": credentialId,
-                       "REGION"       : region,
-                       "USER_NAME"    : userName,
-                       "PASSWORD"     : password,
-                       "GROUPS"       : group.toString().substring(0, group.toString().length() - 1)]
         def response;
-        if (publicInAccount) {
-            response = processPost(Resource.ACCOUNT_STACKS, binding)
+        if (image == null || image == "") {
+            def binding = ["STACK_NAME"   : stackName,
+                           "CREDENTIAL_ID": credentialId,
+                           "REGION"       : region,
+                           "USER_NAME"    : userName,
+                           "PASSWORD"     : password,
+                           "GROUPS"       : group.toString().substring(0, group.toString().length() - 1)]
+            if (publicInAccount) {
+                response = processPost(Resource.ACCOUNT_STACKS, binding)
+            } else {
+                response = processPost(Resource.USER_STACKS, binding)
+            }
         } else {
-            response = processPost(Resource.USER_STACKS, binding)
+            def binding = ["STACK_NAME"   : stackName,
+                           "CREDENTIAL_ID": credentialId,
+                           "REGION"       : region,
+                           "USER_NAME"    : userName,
+                           "IMAGE"        : image,
+                           "PASSWORD"     : password,
+                           "GROUPS"       : group.toString().substring(0, group.toString().length() - 1)]
+            if (publicInAccount) {
+                response = processPost(Resource.ACCOUNT_STACKS_WITH_IMAGE, binding)
+            } else {
+                response = processPost(Resource.USER_STACKS_WITH_IMAGE, binding)
+            }
         }
+
+
+
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
     }
