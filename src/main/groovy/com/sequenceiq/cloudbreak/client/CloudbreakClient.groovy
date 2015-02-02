@@ -44,7 +44,10 @@ class CloudbreakClient {
         GLOBAL_BLUEPRINTS("blueprints", "blueprint.json"),
         CLUSTER_NODECOUNT_PUT("stacks/stack-id/cluster", "cluster_nodecount_put.json"),
         CLUSTERS("stacks/stack-id/cluster", "cluster.json"),
-        CERTIFICATES("credentials/certificate", "certificate.json")
+        CERTIFICATES("credentials/certificate", "certificate.json"),
+        ACCOUNT_RECIPES("account/recipes", "recipe.json"),
+        USER_RECIPES("user/recipes", "recipe.json"),
+        GLOBAL_RECIPES("recipes", "")
 
         def path
         def template
@@ -125,6 +128,19 @@ class CloudbreakClient {
             response = processPost(Resource.ACCOUNT_BLUEPRINTS, binding)
         } else {
             response = processPost(Resource.USER_BLUEPRINTS, binding)
+        }
+        log.debug("Got response: {}", response.data.id)
+        return response?.data?.id
+    }
+
+    def String postRecipe(String recipe, Boolean publicInAccount) throws Exception {
+        log.debug("Posting recipe to account...")
+        def binding = ["RECIPE": recipe]
+        def response;
+        if (publicInAccount) {
+            response = processPost(Resource.ACCOUNT_RECIPES, binding)
+        } else {
+            response = processPost(Resource.USER_RECIPES, binding)
         }
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
@@ -274,9 +290,9 @@ class CloudbreakClient {
         doPut(putCtx)
     }
 
-    def void postCluster(String name, Integer blueprintId, String description, Integer stackId) throws Exception {
+    def void postCluster(String name, Integer blueprintId, Integer recipeId, String description, Integer stackId) throws Exception {
         log.debug("Posting cluster ...")
-        def binding = ["NAME": name, "BLUEPRINT_ID": blueprintId, "DESCRIPTION": description]
+        def binding = ["NAME": name, "BLUEPRINT_ID": blueprintId, "RECIPE_ID": recipeId, "DESCRIPTION": description]
         def json = createJson(Resource.CLUSTERS.template(), binding)
         String path = Resource.CLUSTERS.path().replaceFirst("stack-id", stackId.toString())
         def Map postCtx = createPostRequestContext(path, ['json': json])
@@ -357,6 +373,18 @@ class CloudbreakClient {
         result ?: new HashMap()
     }
 
+    def List<Map> getAccountRecipes() throws Exception {
+        log.debug("Getting recipes...")
+        getAllAsList(Resource.ACCOUNT_RECIPES)
+    }
+
+    def Map<String, String> getAccountRecipesMap() throws Exception {
+        def result = getAccountRecipes()?.collectEntries {
+            [(it.id as String): it.name]
+        }
+        result ?: new HashMap()
+    }
+
     def Map<String, Object> getBlueprintMap(String id) throws Exception {
         def result = getBlueprint(id)?.collectEntries {
             if (it.key == "parameters") {
@@ -365,6 +393,21 @@ class CloudbreakClient {
                 }
             } else if (it.key == "ambariBlueprint") {
                 def result = it.value.host_groups?.collectEntries { [(it.name): it.components.collect { it.name }] }
+                [(it.key as String): result as Map]
+            } else {
+                [(it.key as String): it.value as String]
+            }
+        }
+        result ?: new HashMap()
+    }
+
+    def Map<String, Object> getRecipeMap(String id) throws Exception {
+        def result = getRecipe(id)?.collectEntries {
+            if (it.key == "plugins") {
+                def result = it.value
+                [(it.key as String): it.value as List]
+            } else if (it.key == "properties") {
+                def result = it.value
                 [(it.key as String): result as Map]
             } else {
                 [(it.key as String): it.value as String]
@@ -507,6 +550,11 @@ class CloudbreakClient {
         return deleteOne(Resource.GLOBAL_BLUEPRINTS, id)
     }
 
+    def Object deleteRecipe(String id) throws Exception {
+        log.debug("Delete recipe...")
+        return deleteOne(Resource.GLOBAL_RECIPES, id)
+    }
+
     def Object getCluster(String id) throws Exception {
         log.debug("Getting cluster...")
         String path = Resource.CLUSTERS.path().replaceFirst("stack-id", id.toString())
@@ -524,8 +572,13 @@ class CloudbreakClient {
     }
 
     def Object getBlueprint(String id) throws Exception {
-        log.debug("Getting credentials...")
+        log.debug("Getting blueprint...")
         return getOne(Resource.GLOBAL_BLUEPRINTS, id)
+    }
+
+    def Object getRecipe(String id) throws Exception {
+        log.debug("Getting recipe...")
+        return getOne(Resource.GLOBAL_RECIPES, id)
     }
 
     def Object terminateStack(String id) throws Exception {
