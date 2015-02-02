@@ -404,13 +404,10 @@ class CloudbreakClient {
     def Map<String, Object> getRecipeMap(String id) throws Exception {
         def result = getRecipe(id)?.collectEntries {
             if (it.key == "plugins") {
-                def result = it.value.collectEntries { [(it.url): it.parameters.collect { it }] }
-                [(it.key as String): result as Map]
-            } else if (it.key == "blueprint") {
-                def result = it.value.host_groups?.collectEntries { [(it.name): it.components.collect { it.name }] }
-                [(it.key as String): result as Map]
-            } else if (it.key == "keyvalues") {
-                def result = it.value.collectEntries { [(it.key): it.value] }
+                def result = it.value
+                [(it.key as String): it.value as List]
+            } else if (it.key == "properties") {
+                def result = it.value
                 [(it.key as String): result as Map]
             } else {
                 [(it.key as String): it.value as String]
