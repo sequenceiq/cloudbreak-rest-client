@@ -76,7 +76,7 @@ class CloudbreakClient {
         restClient.headers['Authorization'] = 'Bearer ' + token
     }
 
-    def String postStack(String stackName, String userName, String password, String credentialId, String region, Boolean publicInAccount, Map<String, Map<Long, Integer>> hostGroupTemplates, String image = null) throws Exception {
+    def String postStack(String stackName, String userName, String password, String credentialId, String region, Boolean publicInAccount, Map<String, Map<Long, Integer>> hostGroupTemplates, String onFailure, Long threshold, String adjustmentType, String image = null) throws Exception {
         log.debug("Posting stack ...")
         StringBuilder group = new StringBuilder();
         for (Map.Entry<String, Map<Long, Integer>> map: hostGroupTemplates.entrySet()) {
@@ -93,6 +93,9 @@ class CloudbreakClient {
                            "REGION"       : region,
                            "USER_NAME"    : userName,
                            "PASSWORD"     : password,
+                           "ON_FAILURE"   : onFailure,
+                           "THRESHOLD"    : threshold,
+                           "ADJUSTMENTTYPE" : adjustmentType,
                            "GROUPS"       : group.toString().substring(0, group.toString().length() - 1)]
             if (publicInAccount) {
                 response = processPost(Resource.ACCOUNT_STACKS, binding)
@@ -106,6 +109,9 @@ class CloudbreakClient {
                            "USER_NAME"    : userName,
                            "IMAGE"        : image,
                            "PASSWORD"     : password,
+                           "ON_FAILURE"   : onFailure,
+                           "THRESHOLD"    : threshold,
+                           "ADJUSTMENTTYPE" : adjustmentType,
                            "GROUPS"       : group.toString().substring(0, group.toString().length() - 1)]
             if (publicInAccount) {
                 response = processPost(Resource.ACCOUNT_STACKS_WITH_IMAGE, binding)
