@@ -536,6 +536,11 @@ class CloudbreakClient {
         return getOne(Resource.GLOBAL_STACKS, id)
     }
 
+    def Object getStackByName(String name) throws Exception {
+        log.debug("Getting stack...")
+        return getOne(Resource.ACCOUNT_STACKS, name)
+    }
+
     def Object deleteStack(String id) throws Exception {
         log.debug("Delete stack...")
         return deleteOne(Resource.GLOBAL_STACKS, id)
@@ -568,13 +573,23 @@ class CloudbreakClient {
     }
 
     def Object getCredential(String id) throws Exception {
-        log.debug("Getting credentials...")
+        log.debug("Getting credential...")
         return getOne(Resource.GLOBAL_CREDENTIALS, id)
     }
 
+    def Object getCredentialByName(String name) throws Exception {
+        log.debug("Getting credential by name...")
+        return getOne(Resource.ACCOUNT_CREDENTIALS, name)
+    }
+
     def Object getTemplate(String id) throws Exception {
-        log.debug("Getting credentials...")
+        log.debug("Getting template...")
         return getOne(Resource.GLOBAL_TEMPLATES, id)
+    }
+
+    def Object getTemplateByName(String name) throws Exception {
+        log.debug("Getting template by name...")
+        return getOne(Resource.ACCOUNT_TEMPLATES, name)
     }
 
     def Object getBlueprint(String id) throws Exception {
@@ -582,9 +597,19 @@ class CloudbreakClient {
         return getOne(Resource.GLOBAL_BLUEPRINTS, id)
     }
 
+    def Object getBlueprintByName(String name) throws Exception {
+        log.debug("Getting blueprint by name...")
+        return getOne(Resource.ACCOUNT_BLUEPRINTS, name)
+    }
+
     def Object getRecipe(String id) throws Exception {
         log.debug("Getting recipe...")
         return getOne(Resource.GLOBAL_RECIPES, id)
+    }
+
+    def Object getRecipeByName(String name) throws Exception {
+        log.debug("Getting recipe by name...")
+        return getOne(Resource.ACCOUNT_RECIPES, name)
     }
 
     def Object terminateStack(String id) throws Exception {
