@@ -551,9 +551,19 @@ class CloudbreakClient {
         return deleteOne(Resource.GLOBAL_TEMPLATES, id)
     }
 
+    def Object deleteTemplateByName(String name) throws Exception {
+        log.debug("Delete template...")
+        return deleteOne(Resource.ACCOUNT_TEMPLATES, name)
+    }
+
     def Object deleteCredential(String id) throws Exception {
         log.debug("Delete credential...")
         return deleteOne(Resource.GLOBAL_CREDENTIALS, id)
+    }
+
+    def Object deleteCredentialByName(String name) throws Exception {
+        log.debug("Delete credential...")
+        return deleteOne(Resource.ACCOUNT_CREDENTIALS, name)
     }
 
     def Object deleteBlueprint(String id) throws Exception {
@@ -561,9 +571,19 @@ class CloudbreakClient {
         return deleteOne(Resource.GLOBAL_BLUEPRINTS, id)
     }
 
+    def Object deleteBlueprintByName(String name) throws Exception {
+        log.debug("Delete blueprint...")
+        return deleteOne(Resource.ACCOUNT_BLUEPRINTS, name)
+    }
+
     def Object deleteRecipe(String id) throws Exception {
         log.debug("Delete recipe...")
         return deleteOne(Resource.GLOBAL_RECIPES, id)
+    }
+
+    def Object deleteRecipeByName(String name) throws Exception {
+        log.debug("Delete recipe...")
+        return deleteOne(Resource.ACCOUNT_RECIPES, name)
     }
 
     def Object getCluster(String id) throws Exception {
