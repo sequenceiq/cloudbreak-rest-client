@@ -2,5 +2,6 @@
    "name":"$NAME",
    "blueprintId":$BLUEPRINT_ID,
    "recipeId":$RECIPE_ID,
-   "description":"$DESCRIPTION"
+   "description":"$DESCRIPTION",
+   "hostGroups":[$HOSTGROUPS]
 }
