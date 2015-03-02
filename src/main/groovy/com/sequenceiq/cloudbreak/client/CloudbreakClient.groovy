@@ -76,7 +76,7 @@ class CloudbreakClient {
         restClient.headers['Authorization'] = 'Bearer ' + token
     }
 
-    def String postStack(String stackName, String userName, String password, String credentialId, String region, Boolean publicInAccount, Map<String, Map<Long, Integer>> hostGroupTemplates, String onFailure, Long threshold, String adjustmentType, String image = null) throws Exception {
+    def String postStack(String stackName, String userName, String password, String credentialId, String region, Boolean publicInAccount, Map<String, Map<Long, Integer>> hostGroupTemplates, String onFailure, Long threshold, String adjustmentType, String image = null, Map<String, String> parameters) throws Exception {
         log.debug("Posting stack ...")
         StringBuilder group = new StringBuilder();
         for (Map.Entry<String, Map<Long, Integer>> map: hostGroupTemplates.entrySet()) {
@@ -85,6 +85,11 @@ class CloudbreakClient {
                 group.append(String.format("\"templateId\": %s, \"group\": \"%s\", \"nodeCount\": %s", entry.getKey(), map.getKey(), entry.getValue()));
                 group.append("},");
             }
+        }
+        StringBuilder params = new StringBuilder();
+        for (Map.Entry<String, String> map : parameters.entrySet()) {
+            String value = map.getValue() != null ? "\"" + map.getValue() + "\"" : null;
+            params.append(String.format("\"%s\" : %s,", map.getKey(), value));
         }
         def response;
         if (image == null || image == "") {
@@ -96,7 +101,8 @@ class CloudbreakClient {
                            "ON_FAILURE"   : onFailure,
                            "THRESHOLD"    : threshold,
                            "ADJUSTMENTTYPE" : adjustmentType,
-                           "GROUPS"       : group.toString().substring(0, group.toString().length() - 1)]
+                           "GROUPS"       : group.toString().substring(0, group.toString().length() - 1),
+                           "PARAMETERS" : params.toString().substring(0, params.toString().length() - 1)]
             if (publicInAccount) {
                 response = processPost(Resource.ACCOUNT_STACKS, binding)
             } else {
@@ -112,7 +118,8 @@ class CloudbreakClient {
                            "ON_FAILURE"   : onFailure,
                            "THRESHOLD"    : threshold,
                            "ADJUSTMENTTYPE" : adjustmentType,
-                           "GROUPS"       : group.toString().substring(0, group.toString().length() - 1)]
+                           "GROUPS"       : group.toString().substring(0, group.toString().length() - 1),
+                           "PARAMETERS" : params.toString().substring(0, params.toString().length() - 1)]
             if (publicInAccount) {
                 response = processPost(Resource.ACCOUNT_STACKS_WITH_IMAGE, binding)
             } else {
