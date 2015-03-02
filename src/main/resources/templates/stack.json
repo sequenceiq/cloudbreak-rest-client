@@ -9,5 +9,6 @@
       "threshold" : $THRESHOLD,
       "adjustmentType" : "$ADJUSTMENTTYPE"
    },
-   "instanceGroups": [$GROUPS]
+   "instanceGroups": [$GROUPS],
+   "parameters" : {$PARAMETERS}
 }
