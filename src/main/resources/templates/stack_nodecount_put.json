@@ -1,6 +1,6 @@
 {
-    "hostGroupAdjustment": {
-        "hostGroup": "$HOST_GROUP",
+    "instanceGroupAdjustment": {
+        "instanceGroup": "$INSTANCE_GROUP",
         "scalingAdjustment": $ADJUSTMENT
     }
 }

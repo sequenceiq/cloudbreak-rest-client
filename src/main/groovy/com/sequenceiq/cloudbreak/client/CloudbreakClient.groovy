@@ -79,7 +79,7 @@ class CloudbreakClient {
     def String postStack(String stackName, String userName, String password, String credentialId, String region, Boolean publicInAccount, Map<String, Map<Long, Integer>> hostGroupTemplates, String onFailure, Long threshold, String adjustmentType, String image = null, Map<String, String> parameters) throws Exception {
         log.debug("Posting stack ...")
         StringBuilder group = new StringBuilder();
-        for (Map.Entry<String, Map<Long, Integer>> map: hostGroupTemplates.entrySet()) {
+        for (Map.Entry<String, Map<Long, Integer>> map : hostGroupTemplates.entrySet()) {
             for (Map.Entry<Long, Integer> entry : map.value.entrySet()) {
                 group.append("{");
                 group.append(String.format("\"templateId\": %s, \"group\": \"%s\", \"nodeCount\": %s", entry.getKey(), map.getKey(), entry.getValue()));
@@ -295,17 +295,27 @@ class CloudbreakClient {
         resp?.data?.status
     }
 
-    def void putStack(int stackId, String hostGroup, int adjustment) {
-        def binding = ["HOST_GROUP": hostGroup, "ADJUSTMENT": adjustment]
+    def void putStack(int stackId, String instanceGroup, int adjustment) {
+        def binding = ["INSTANCE_GROUP": instanceGroup, "ADJUSTMENT": adjustment]
         def json = createJson(Resource.GLOBAL_STACKS_NODECOUNT_PUT.template(), binding)
         String path = Resource.GLOBAL_STACKS_NODECOUNT_PUT.path() + "/$stackId"
         def Map putCtx = createPostRequestContext(path, ['json': json])
         doPut(putCtx)
     }
 
-    def void postCluster(String name, Integer blueprintId, Integer recipeId, String description, Integer stackId) throws Exception {
+    def void postCluster(String name, Integer blueprintId, Integer recipeId, String description, Integer stackId, Map<String, String> hostGroups) throws Exception {
         log.debug("Posting cluster ...")
-        def binding = ["NAME": name, "BLUEPRINT_ID": blueprintId, "RECIPE_ID": recipeId, "DESCRIPTION": description]
+        StringBuilder hostGroupsJson = new StringBuilder();
+        for (Map.Entry<String, String> entry : hostGroups.entrySet()) {
+            hostGroupsJson.append("{");
+            hostGroupsJson.append(String.format("\"name\": \"%s\", \"instanceGroupName\": \"%s\"", entry.getKey(), entry.getValue()));
+            hostGroupsJson.append("},");
+        }
+        def binding = ["NAME": name,
+                       "BLUEPRINT_ID": blueprintId,
+                       "RECIPE_ID": recipeId,
+                       "DESCRIPTION": description,
+                       "HOSTGROUPS": hostGroupsJson.toString().substring(0, hostGroupsJson.toString().length() - 1)]
         def json = createJson(Resource.CLUSTERS.template(), binding)
         String path = Resource.CLUSTERS.path().replaceFirst("stack-id", stackId.toString())
         def Map postCtx = createPostRequestContext(path, ['json': json])
@@ -456,7 +466,7 @@ class CloudbreakClient {
     def Map<String, Map<String, String>> getAccountTemplatesWithCloudPlatformMap(String cloudPlatform = "") throws Exception {
         def templates = getAccountTemplates()
         def result
-        if(cloudPlatform == "") {
+        if (cloudPlatform == "") {
             result = templates?.collectEntries {
                 Map<String, String> inside = new HashMap<>()
                 inside.put(it.name as String, it.cloudPlatform as String)
