@@ -19,9 +19,9 @@ class CloudbreakClientTest extends Specification {
 
     def "test post stack"() {
         Map<String, Map.Entry<Long, Integer>> map = new HashMap<>()
-        Map.Entry<Long,Integer> entry1 =
+        Map.Entry<Long, Integer> entry1 =
                 new AbstractMap.SimpleEntry<Long, Integer>(1l, 1);
-        Map.Entry<Long,Integer> entry2 =
+        Map.Entry<Long, Integer> entry2 =
                 new AbstractMap.SimpleEntry<Long, Integer>(1l, 1);
         map.put("master", entry1);
         map.put("slave_1", entry2);
@@ -29,7 +29,6 @@ class CloudbreakClientTest extends Specification {
         Object resp = cloudbreakClient.postStack("mystack", "admin", "admin", "59", "EU_WEST", true, map);
         println resp
     }
-
 
     // USER_TEMPLATES
 
@@ -73,7 +72,6 @@ class CloudbreakClientTest extends Specification {
         println resp
     }
 
-
     // USER_CREDENTIALS
 
     def "test post credential"() {
@@ -98,12 +96,11 @@ class CloudbreakClientTest extends Specification {
         println mapResp
     }
 
-
     // USER_BLUEPRINTS
 
     def "test post blueprint"() {
         expect:
-        Object resp = cloudbreakClient.postBlueprint("bp1","desc",getClass().getClassLoader().getResourceAsStream("blueprints/multi-node-hdfs-yarn")?.text);
+        Object resp = cloudbreakClient.postBlueprint("bp1", "desc", getClass().getClassLoader().getResourceAsStream("blueprints/multi-node-hdfs-yarn")?.text);
         println resp
     }
 
@@ -123,12 +120,23 @@ class CloudbreakClientTest extends Specification {
         println mapResp
     }
 
-
     // USER_STACKS
 
     def "test post cluster"() {
+        def hostgroups = [
+                [
+                        "name"             : "master",
+                        "instanceGroupName": "masterIg",
+                        "recipeIds"         : [23, 24]
+                ],
+                [
+                        "name"             : "slave_1",
+                        "instanceGroupName": "slave_1Ig",
+                        "recipeIds"         : [24, 25]
+                ]
+        ]
         expect:
-        Object resp = cloudbreakClient.postCluster("test", 52, 51)
+        Object resp = cloudbreakClient.postCluster("test", 52, "description", 51, hostgroups)
         log.debug("RESP: {}", resp)
     }
 

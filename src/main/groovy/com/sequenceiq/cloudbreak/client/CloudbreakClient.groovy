@@ -303,23 +303,17 @@ class CloudbreakClient {
         doPut(putCtx)
     }
 
-    def void postCluster(String name, Integer blueprintId, Integer recipeId, String description, Integer stackId, Map<String, String> hostGroups) throws Exception {
+    def void postCluster(String name, Integer blueprintId, String description, Integer stackId, List<Map<String, Object>> hostGroups) throws Exception {
         log.debug("Posting cluster ...")
-        StringBuilder hostGroupsJson = new StringBuilder();
-        for (Map.Entry<String, String> entry : hostGroups.entrySet()) {
-            hostGroupsJson.append("{");
-            hostGroupsJson.append(String.format("\"name\": \"%s\", \"instanceGroupName\": \"%s\"", entry.getKey(), entry.getValue()));
-            hostGroupsJson.append("},");
-        }
+        String hostGroupsJson = new JsonBuilder(hostGroups).toPrettyString();
         def binding = ["NAME": name,
                        "BLUEPRINT_ID": blueprintId,
-                       "RECIPE_ID": recipeId,
                        "DESCRIPTION": description,
-                       "HOSTGROUPS": hostGroupsJson.toString().substring(0, hostGroupsJson.toString().length() - 1)]
+                       "HOSTGROUPS": hostGroupsJson]
         def json = createJson(Resource.CLUSTERS.template(), binding)
         String path = Resource.CLUSTERS.path().replaceFirst("stack-id", stackId.toString())
         def Map postCtx = createPostRequestContext(path, ['json': json])
-        def response = doPost(postCtx)
+        doPost(postCtx)
     }
 
     def void addDefaultBlueprints() throws HttpResponseException {
@@ -428,7 +422,7 @@ class CloudbreakClient {
         def result = getRecipe(id)?.collectEntries {
             if (it.key == "plugins") {
                 def result = it.value
-                [(it.key as String): it.value as List]
+                [(it.key as String): it.value as Map]
             } else if (it.key == "properties") {
                 def result = it.value
                 [(it.key as String): result as Map]
