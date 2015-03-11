@@ -200,9 +200,9 @@ class CloudbreakClient {
         return getOne(Resource.CERTIFICATE, id).text
     }
 
-    def String postSpotEc2Template(String name, String description, String sshLocation, String instanceType, String volumeCount, String volumeSize, String volumeType, String spotPrice, Boolean publicInAccount) throws Exception {
+    def String postSpotEc2Template(String name, String description, String sshLocation, String instanceType, String volumeCount, String volumeSize, String volumeType, String spotPrice, Boolean publicInAccount, Boolean encrypted) throws Exception {
         log.debug("testing credential ...")
-        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "SSH_LOCATION": sshLocation, "INSTANCE_TYPE": instanceType, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "VOLUME_TYPE": volumeType, "SPOT_PRICE": spotPrice]
+        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "SSH_LOCATION": sshLocation, "INSTANCE_TYPE": instanceType, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "VOLUME_TYPE": volumeType, "ENCRYPTED": encrypted, "SPOT_PRICE": spotPrice]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_TEMPLATES_EC2_SPOT, binding)
@@ -213,9 +213,9 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postEc2Template(String name, String description, String sshLocation, String instanceType, String volumeCount, String volumeSize, String volumeType, Boolean publicInAccount) throws Exception {
+    def String postEc2Template(String name, String description, String sshLocation, String instanceType, String volumeCount, String volumeSize, String volumeType, Boolean publicInAccount, Boolean encrypted) throws Exception {
         log.debug("testing credential ...")
-        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "SSH_LOCATION": sshLocation, "INSTANCE_TYPE": instanceType, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "VOLUME_TYPE": volumeType]
+        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "SSH_LOCATION": sshLocation, "INSTANCE_TYPE": instanceType, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "VOLUME_TYPE": volumeType, "ENCRYPTED": encrypted]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_TEMPLATES_EC2, binding)

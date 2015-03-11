@@ -7,6 +7,7 @@
     "parameters": {
         "sshLocation": "$SSH_LOCATION",
         "instanceType": "$INSTANCE_TYPE",
-        "volumeType": "$VOLUME_TYPE"
+        "volumeType": "$VOLUME_TYPE",
+        "encrypted": $ENCRYPTED
     }
 }
