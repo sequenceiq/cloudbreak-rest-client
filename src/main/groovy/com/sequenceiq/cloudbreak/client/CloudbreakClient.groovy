@@ -295,8 +295,8 @@ class CloudbreakClient {
         resp?.data?.status
     }
 
-    def void putStack(int stackId, String instanceGroup, int adjustment) {
-        def binding = ["INSTANCE_GROUP": instanceGroup, "ADJUSTMENT": adjustment]
+    def void putStack(int stackId, String instanceGroup, int adjustment, Integer threshold, String adjustmentType) {
+        def binding = ["INSTANCE_GROUP": instanceGroup, "ADJUSTMENT": adjustment, "THRESHOLD": threshold, "ADJUSTMENTTYPE": adjustmentType]
         def json = createJson(Resource.GLOBAL_STACKS_NODECOUNT_PUT.template(), binding)
         String path = Resource.GLOBAL_STACKS_NODECOUNT_PUT.path() + "/$stackId"
         def Map putCtx = createPostRequestContext(path, ['json': json])

@@ -1,6 +1,10 @@
 {
     "instanceGroupAdjustment": {
         "instanceGroup": "$INSTANCE_GROUP",
-        "scalingAdjustment": $ADJUSTMENT
+        "scalingAdjustment": $ADJUSTMENT,
+        "failurePolicy": {
+            "threshold": $THRESHOLD,
+            "adjustmentType": "$ADJUSTMENTTYPE"
+        }
     }
 }
