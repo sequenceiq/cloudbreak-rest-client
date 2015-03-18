@@ -1,10 +1,12 @@
 package com.sequenceiq.cloudbreak.main;
 
+import static com.sequenceiq.cloudbreak.main.VersionedApplication.versionedApplication;
+
 import java.io.IOException;
 
-public class CloudbreakClientMain extends VersionedApplication {
+public class CloudbreakClientMain {
 
     public static void main(String[] args) throws IOException {
-        start(CloudbreakClientMain.class, args);
+        versionedApplication().showVersionInfo(args);
     }
 }
