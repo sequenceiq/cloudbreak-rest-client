@@ -5,11 +5,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class VersionedApplication {
-
     public static final String LONG_VERSION = "--version";
     public static final String SHORT_VERSION = "-v";
 
-    protected static void start(Class clazz, String[] args) {
+    private VersionedApplication() {
+
+    }
+
+    public boolean showVersionInfo(String[] args) {
         if (checkIfParamVersion(args)) {
             try {
                 if (LONG_VERSION.equals(args[0])) {
@@ -20,14 +23,16 @@ public class VersionedApplication {
             } catch (IOException ex) {
                 System.out.println("The application.properties file not found version is undefined.");
             }
+            return true;
         }
+        return false;
     }
 
-    private static boolean checkIfParamVersion(String[] args) {
+    private boolean checkIfParamVersion(String[] args) {
         return args.length == 1 && (LONG_VERSION.equals(args[0]) || SHORT_VERSION.equals(args[0]));
     }
 
-    private static String readVersionFromClasspath(String fileName, boolean onlyVersion) throws IOException {
+    private String readVersionFromClasspath(String fileName, boolean onlyVersion) throws IOException {
         StringBuilder sb = new StringBuilder();
         BufferedReader br;
         br = new BufferedReader(new InputStreamReader(VersionedApplication.class.getClassLoader().getResource(fileName).openStream(), "UTF-8"));
@@ -43,5 +48,9 @@ public class VersionedApplication {
             }
         }
         return sb.toString();
+    }
+
+    public static VersionedApplication versionedApplication() {
+        return new VersionedApplication();
     }
 }
