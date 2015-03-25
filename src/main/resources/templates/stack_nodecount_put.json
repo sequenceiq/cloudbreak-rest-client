@@ -1,6 +1,7 @@
 {
     "instanceGroupAdjustment": {
         "instanceGroup": "$INSTANCE_GROUP",
-        "scalingAdjustment": $ADJUSTMENT
+        "scalingAdjustment": $ADJUSTMENT,
+        "withClusterEvent" : $WITHCLUSTEREVENT
     }
 }

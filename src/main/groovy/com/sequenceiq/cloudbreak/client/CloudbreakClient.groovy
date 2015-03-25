@@ -72,6 +72,8 @@ class CloudbreakClient {
     CloudbreakClient(String address, token) {
         address = address.endsWith("/") ? address : address + "/";
         restClient = new RESTClient(address as String)
+        restClient.client.params.setParameter("http.socket.timeout", new Integer(10000))
+        restClient.client.params.setParameter("http.connection.timeout", new Integer(10000))
         restClient.ignoreSSLIssues();
         restClient.headers['Authorization'] = 'Bearer ' + token
     }
@@ -271,17 +273,17 @@ class CloudbreakClient {
         doPost(context)?.data
     }
 
-    def int putCluster(String ambari, String hostGroup, int scalingAdjustment) throws Exception {
+    def int putCluster(String ambari, String hostGroup, int scalingAdjustment, Boolean withStackUpdate = false) throws Exception {
         def stackId = getStackId(ambari)
         if (stackId) {
-            putCluster(stackId, hostGroup, scalingAdjustment);
+            putCluster(stackId, hostGroup, scalingAdjustment, withStackUpdate);
         }
         stackId
     }
 
-    def void putCluster(int stackId, String hostGroup, int scalingAdjustment) throws Exception {
+    def void putCluster(int stackId, String hostGroup, int scalingAdjustment, Boolean withStackUpdate) throws Exception {
         log.debug("Putting cluster ...")
-        def binding = ["HOST_GROUPS": new JsonBuilder(["hostGroup": hostGroup, "scalingAdjustment": scalingAdjustment]).toPrettyString()]
+        def binding = ["HOST_GROUPS": new JsonBuilder(["hostGroup": hostGroup, "scalingAdjustment": scalingAdjustment, "withStackUpdate": withStackUpdate]).toPrettyString()]
         def json = createJson(Resource.CLUSTER_NODECOUNT_PUT.template(), binding)
         String path = Resource.CLUSTER_NODECOUNT_PUT.path().replaceFirst("stack-id", stackId.toString())
         def Map putCtx = createPostRequestContext(path, ['json': json])
@@ -295,8 +297,8 @@ class CloudbreakClient {
         resp?.data?.status
     }
 
-    def void putStack(int stackId, String instanceGroup, int adjustment) {
-        def binding = ["INSTANCE_GROUP": instanceGroup, "ADJUSTMENT": adjustment]
+    def void putStack(int stackId, String instanceGroup, int adjustment, Boolean withClusterUpdate = false) {
+        def binding = ["INSTANCE_GROUP": instanceGroup, "ADJUSTMENT": adjustment, "WITHCLUSTEREVENT": withClusterUpdate]
         def json = createJson(Resource.GLOBAL_STACKS_NODECOUNT_PUT.template(), binding)
         String path = Resource.GLOBAL_STACKS_NODECOUNT_PUT.path() + "/$stackId"
         def Map putCtx = createPostRequestContext(path, ['json': json])
