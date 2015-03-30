@@ -78,15 +78,13 @@ class CloudbreakClient {
         restClient.headers['Authorization'] = 'Bearer ' + token
     }
 
-    def String postStack(String stackName, String userName, String password, String credentialId, String region, Boolean publicInAccount, Map<String, Map<Long, Integer>> hostGroupTemplates, String onFailure, Long threshold, String adjustmentType, String image = null, Map<String, String> parameters) throws Exception {
+    def String postStack(String stackName, String userName, String password, String credentialId, String region, Boolean publicInAccount, Map<String, Object> instanceGroupTemplates, String onFailure, Long threshold, String adjustmentType, String image = null, Map<String, String> parameters) throws Exception {
         log.debug("Posting stack ...")
         StringBuilder group = new StringBuilder();
-        for (Map.Entry<String, Map<Long, Integer>> map : hostGroupTemplates.entrySet()) {
-            for (Map.Entry<Long, Integer> entry : map.value.entrySet()) {
-                group.append("{");
-                group.append(String.format("\"templateId\": %s, \"group\": \"%s\", \"nodeCount\": %s", entry.getKey(), map.getKey(), entry.getValue()));
-                group.append("},");
-            }
+        for (Map.Entry<String, Object> map : instanceGroupTemplates.entrySet()) {
+            group.append("{");
+            group.append(String.format("\"templateId\": %s, \"group\": \"%s\", \"nodeCount\": %s, \"type\": \"%s\"", map.getValue().templateId, map.getKey(), map.getValue().nodeCount, map.getValue().type));
+            group.append("},");
         }
         StringBuilder paramsBuilder = new StringBuilder();
         for (Map.Entry<String, String> map : parameters.entrySet()) {
