@@ -16,8 +16,10 @@ class CloudbreakClient {
         USER_CREDENTIALS_EC2("user/credentials", "credentials_ec2.json"),
         USER_CREDENTIALS_AZURE("user/credentials", "credentials_azure.json"),
         USER_CREDENTIALS_GCC("user/credentials", "credentials_gcc.json"),
+        USER_CREDENTIALS_OPENSTACK("user/credentials", "credentials_openstack.json"),
         ACCOUNT_CREDENTIALS("account/credentials", "credentials.json"),
         ACCOUNT_CREDENTIALS_EC2("account/credentials", "credentials_ec2.json"),
+        ACCOUNT_CREDENTIALS_OPENSTACK("account/credentials", "credentials_openstack.json"),
         ACCOUNT_CREDENTIALS_AZURE("account/credentials", "credentials_azure.json"),
         ACCOUNT_CREDENTIALS_GCC("account/credentials", "credentials_gcc.json"),
         GLOBAL_CREDENTIALS("credentials", ""),
@@ -26,11 +28,13 @@ class CloudbreakClient {
         USER_TEMPLATES_EC2_SPOT("user/templates", "template_spot_ec2.json"),
         USER_TEMPLATES_GCC("user/templates", "template_gcc.json"),
         USER_TEMPLATES_AZURE("user/templates", "template_azure.json"),
+        USER_TEMPLATES_OPENSTACK("user/templates", "template_openstack.json"),
         ACCOUNT_TEMPLATES("account/templates", "template.json"),
         ACCOUNT_TEMPLATES_EC2("account/templates", "template_ec2.json"),
         ACCOUNT_TEMPLATES_EC2_SPOT("account/templates", "template_spot_ec2.json"),
         ACCOUNT_TEMPLATES_AZURE("account/templates", "template_azure.json"),
         ACCOUNT_TEMPLATES_GCC("account/templates", "template_gcc.json"),
+        ACCOUNT_TEMPLATES_OPENSTACK("account/templates", "template_openstack.json"),
         GLOBAL_TEMPLATES("templates", ""),
         USER_STACKS("user/stacks", "stack.json"),
         ACCOUNT_STACKS("account/stacks", "stack.json"),
@@ -72,8 +76,8 @@ class CloudbreakClient {
     CloudbreakClient(String address, token) {
         address = address.endsWith("/") ? address : address + "/";
         restClient = new RESTClient(address as String)
-        restClient.client.params.setParameter("http.socket.timeout", new Integer(10000))
-        restClient.client.params.setParameter("http.connection.timeout", new Integer(10000))
+        restClient.client.params.setParameter("http.socket.timeout", new Integer(60000))
+        restClient.client.params.setParameter("http.connection.timeout", new Integer(60000))
         restClient.ignoreSSLIssues();
         restClient.headers['Authorization'] = 'Bearer ' + token
     }
@@ -171,6 +175,18 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
+    def String postOpenStackCredential(String name, String description, String userName, String password, String tenantName, String endPoint, String sshKey, Boolean publicInAccount) throws Exception {
+        log.debug("Posting credential ...")
+        def binding = ["CLOUD_PLATFORM": "OPENSTACK", "NAME": name, "USERNAME": userName, "PASSWORD": password, "TENANTNAME": tenantName, "ENDPOINT": endPoint, "DESCRIPTION": description, "SSHKEY": sshKey]
+        def response;
+        if (publicInAccount) {
+            response = processPost(Resource.ACCOUNT_CREDENTIALS_OPENSTACK, binding)
+        } else {
+            response = processPost(Resource.USER_CREDENTIALS_OPENSTACK, binding)
+        }
+        return response?.data?.id
+    }
+
     def String postGccCredential(String name, String description, String sshKey, Boolean publicInAccount, String projectId, String serviceAccountId, String serviceAccountPrivateKey) throws Exception {
         log.debug("Posting credential ...")
         def binding = ["CLOUD_PLATFORM": "GCC", "NAME": name, "PROJECT_ID": projectId, "DESCRIPTION": description, "SSHKEY": sshKey, "SERVICE_ACCOUNT_ID": serviceAccountId, "SERVICE_ACCOUNT_PRIVATE_KEY": serviceAccountPrivateKey]
@@ -234,6 +250,19 @@ class CloudbreakClient {
             response = processPost(Resource.ACCOUNT_TEMPLATES_GCC, binding)
         } else {
             response = processPost(Resource.USER_TEMPLATES_GCC, binding)
+        }
+        log.debug("Got response: {}", response.data.id)
+        return response?.data?.id
+    }
+
+    def String postOpenStackTemplate(String name, String description, String instanceType, String publicNetId, String volumeCount, String volumeSize, Boolean publicInAccount) throws Exception {
+        log.debug("testing credential ...")
+        def binding = ["CLOUD_PLATFORM": "OPENSTACK", "NAME": name, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "PUBLICNETID": publicNetId, "INSTANCE_TYPE": instanceType]
+        def response;
+        if (publicInAccount) {
+            response = processPost(Resource.ACCOUNT_TEMPLATES_OPENSTACK, binding)
+        } else {
+            response = processPost(Resource.USER_TEMPLATES_OPENSTACK, binding)
         }
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
@@ -319,7 +348,6 @@ class CloudbreakClient {
     def void addDefaultBlueprints() throws HttpResponseException {
         postBlueprint("multi-node-hdfs-yarn", "multi-node-hdfs-yarn", getResourceContent("blueprints/multi-node-hdfs-yarn"), false)
         postBlueprint("hdp-multinode-default", "hdp-multinode-default", getResourceContent("blueprints/hdp-multinode-default"), false)
-        postBlueprint("lambda-architecture", "lambda-architecture", getResourceContent("blueprints/lambda-architecture"), false)
     }
 
     def boolean health() throws Exception {
