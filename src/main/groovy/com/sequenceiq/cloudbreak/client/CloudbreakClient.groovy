@@ -41,12 +41,14 @@ class CloudbreakClient {
         ACCOUNT_STACKS_WITH_IMAGE("account/stacks", "stackimage.json"),
         USER_STACKS_WITH_IMAGE("user/stacks", "stackimage.json"),
         GLOBAL_STACKS_NODECOUNT_PUT("stacks", "stack_nodecount_put.json"),
+        GLOBAL_STACKS_STATUS_PUT("stacks", "stack_status_put.json"),
         GLOBAL_STACKS("stacks", ""),
         STACK_AMBARI("stacks/ambari", ""),
         USER_BLUEPRINTS("user/blueprints", "blueprint.json"),
         ACCOUNT_BLUEPRINTS("account/blueprints", "blueprint.json"),
         GLOBAL_BLUEPRINTS("blueprints", "blueprint.json"),
         CLUSTER_NODECOUNT_PUT("stacks/stack-id/cluster", "cluster_nodecount_put.json"),
+        CLUSTER_STATUS_PUT("stacks/stack-id/cluster", "cluster_status_put.json"),
         CLUSTERS("stacks/stack-id/cluster", "cluster.json"),
         CERTIFICATES("credentials/certificate", "certificate.json"),
         ACCOUNT_RECIPES("account/recipes", "recipe.json"),
@@ -242,9 +244,9 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postGccTemplate(String name, String description, String gccInstanceType, String volumeCount, String volumeSize, Boolean publicInAccount) throws Exception {
+    def String postGccTemplate(String name, String description, String gccInstanceType, String gccVolumeType = "HDD", String volumeCount, String volumeSize, Boolean publicInAccount) throws Exception {
         log.debug("testing credential ...")
-        def binding = ["CLOUD_PLATFORM": "GCC", "NAME": name, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "GCC_INSTANCE_TYPE": gccInstanceType]
+        def binding = ["CLOUD_PLATFORM": "GCC", "NAME": name, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "GCC_INSTANCE_TYPE": gccInstanceType, "GCC_VOLUME_TYPE": gccVolumeType]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_TEMPLATES_GCC, binding)
@@ -317,17 +319,38 @@ class CloudbreakClient {
         doPut(putCtx)
     }
 
-    def String getStackStatus(int stackId) {
+    def void putClusterStatus(int stackId, String newStatus) throws Exception {
+        log.debug("Putting cluster status...")
+        def binding = ["NEW_STATUS": newStatus]
+        def json = createJson(Resource.CLUSTER_STATUS_PUT.template(), binding)
+        String path = Resource.CLUSTER_STATUS_PUT.path().replaceFirst("stack-id", stackId.toString())
+        def Map putCtx = createPostRequestContext(path, ['json': json])
+        doPut(putCtx)
+    }
+
+    def Object getFullStackStatus(int stackId) {
         String path = "${Resource.GLOBAL_STACKS.path()}/$stackId/status"
         Map getCtx = createGetRequestContext(path);
         def resp = doGet(getCtx)
-        resp?.data?.status
+        resp?.data
+    }
+
+    def String getStackStatus(int stackId) {
+        getFullStackStatus(stackId)?.status
     }
 
     def void putStack(int stackId, String instanceGroup, int adjustment, Boolean withClusterUpdate = false) {
         def binding = ["INSTANCE_GROUP": instanceGroup, "ADJUSTMENT": adjustment, "WITHCLUSTEREVENT": withClusterUpdate]
         def json = createJson(Resource.GLOBAL_STACKS_NODECOUNT_PUT.template(), binding)
         String path = Resource.GLOBAL_STACKS_NODECOUNT_PUT.path() + "/$stackId"
+        def Map putCtx = createPostRequestContext(path, ['json': json])
+        doPut(putCtx)
+    }
+
+    def void putStackStatus(int stackId, String status) {
+        def binding = ["NEW_STATUS": status]
+        def json = createJson(Resource.GLOBAL_STACKS_STATUS_PUT.template(), binding)
+        String path = Resource.GLOBAL_STACKS_STATUS_PUT.path() + "/$stackId"
         def Map putCtx = createPostRequestContext(path, ['json': json])
         doPut(putCtx)
     }
