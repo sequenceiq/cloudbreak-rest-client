@@ -5,6 +5,7 @@
     "volumeCount": "$VOLUME_COUNT",
     "volumeSize": "$VOLUME_SIZE",
     "parameters": {
-        "gccInstanceType": "$GCC_INSTANCE_TYPE"
+        "gccInstanceType": "$GCC_INSTANCE_TYPE",
+        "gccVolumeType": "$GCC_VOLUME_TYPE"
     }
 }
