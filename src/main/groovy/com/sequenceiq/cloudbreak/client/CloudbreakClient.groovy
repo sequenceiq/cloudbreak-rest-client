@@ -53,7 +53,18 @@ class CloudbreakClient {
         CERTIFICATES("credentials/certificate", "certificate.json"),
         ACCOUNT_RECIPES("account/recipes", "recipe.json"),
         USER_RECIPES("user/recipes", "recipe.json"),
-        GLOBAL_RECIPES("recipes", "")
+        GLOBAL_RECIPES("recipes", ""),
+        USER_NETWORKS("user/networks", ""),
+        USER_NETWORKS_AWS("user/networks", "networks_aws.json"),
+        USER_NETWORKS_AZURE("user/networks", "networks_azure.json"),
+        USER_NETWORKS_GCP("user/networks", "networks_gcp.json"),
+        USER_NETWORKS_OPENSTACK("user/networks", "networks_openstack.json"),
+        ACCOUNT_NETWORKS("account/networks", ""),
+        ACCOUNT_NETWORKS_AWS("account/networks", "networks_aws.json"),
+        ACCOUNT_NETWORKS_AZURE("account/networks", "networks_azure.json"),
+        ACCOUNT_NETWORKS_OPENSTACK("account/networks", "networks_openstack.json"),
+        ACCOUNT_NETWORKS_GCP("account/networks", "networks_gcp.json"),
+        GLOBAL_NETWORKS("networks", "")
 
         def path
         def template
@@ -84,7 +95,7 @@ class CloudbreakClient {
         restClient.headers['Authorization'] = 'Bearer ' + token
     }
 
-    def String postStack(String stackName, String userName, String password, String credentialId, String region, Boolean publicInAccount, Map<String, Object> instanceGroupTemplates, String onFailure, Long threshold, String adjustmentType, String image = null, Map<String, String> parameters) throws Exception {
+    def String postStack(String stackName, String userName, String password, String credentialId, String region, Boolean publicInAccount, Map<String, Object> instanceGroupTemplates, String onFailure, Long threshold, String adjustmentType, String image = null, String networkId) throws Exception {
         log.debug("Posting stack ...")
         StringBuilder group = new StringBuilder();
         for (Map.Entry<String, Object> map : instanceGroupTemplates.entrySet()) {
@@ -92,11 +103,6 @@ class CloudbreakClient {
             group.append(String.format("\"templateId\": %s, \"group\": \"%s\", \"nodeCount\": %s, \"type\": \"%s\"", map.getValue().templateId, map.getKey(), map.getValue().nodeCount, map.getValue().type));
             group.append("},");
         }
-        StringBuilder paramsBuilder = new StringBuilder();
-        for (Map.Entry<String, String> map : parameters.entrySet()) {
-            paramsBuilder.append(String.format("\"%s\" : \"%s\",", map.getKey(), map.getValue()));
-        }
-        String params = paramsBuilder.toString().length() > 0 ? paramsBuilder.toString().substring(0, paramsBuilder.toString().length() - 1) : "";
         def response;
         if (image == null || image == "") {
             def binding = ["STACK_NAME"   : stackName,
@@ -108,7 +114,7 @@ class CloudbreakClient {
                            "THRESHOLD"    : threshold,
                            "ADJUSTMENTTYPE" : adjustmentType,
                            "GROUPS"       : group.toString().substring(0, group.toString().length() - 1),
-                           "PARAMETERS" : params]
+                           "NETWORK_ID"   : networkId]
             if (publicInAccount) {
                 response = processPost(Resource.ACCOUNT_STACKS, binding)
             } else {
@@ -125,15 +131,13 @@ class CloudbreakClient {
                            "THRESHOLD"    : threshold,
                            "ADJUSTMENTTYPE" : adjustmentType,
                            "GROUPS"       : group.toString().substring(0, group.toString().length() - 1),
-                           "PARAMETERS" : params]
+                           "NETWORK_ID"   : networkId]
             if (publicInAccount) {
                 response = processPost(Resource.ACCOUNT_STACKS_WITH_IMAGE, binding)
             } else {
                 response = processPost(Resource.USER_STACKS_WITH_IMAGE, binding)
             }
         }
-
-
 
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
@@ -257,9 +261,9 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postOpenStackTemplate(String name, String description, String instanceType, String publicNetId, String volumeCount, String volumeSize, Boolean publicInAccount) throws Exception {
+    def String postOpenStackTemplate(String name, String description, String instanceType, String volumeCount, String volumeSize, Boolean publicInAccount) throws Exception {
         log.debug("testing credential ...")
-        def binding = ["CLOUD_PLATFORM": "OPENSTACK", "NAME": name, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "PUBLICNETID": publicNetId, "INSTANCE_TYPE": instanceType]
+        def binding = ["CLOUD_PLATFORM": "OPENSTACK", "NAME": name, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "INSTANCE_TYPE": instanceType]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_TEMPLATES_OPENSTACK, binding)
@@ -453,6 +457,23 @@ class CloudbreakClient {
         result ?: new HashMap()
     }
 
+    def List<Map> getPrivateNetworks() throws Exception {
+        log.debug("Getting networks...")
+        getAllAsList(Resource.USER_NETWORKS)
+    }
+
+    def List<Map> getAccountNetworks() throws Exception {
+        log.debug("Getting networks...")
+        getAllAsList(Resource.ACCOUNT_NETWORKS)
+    }
+
+    def Map<String, String> getAccountNetworksMap() throws Exception {
+        def result = getAccountNetworks()?.collectEntries {
+            [(it.id as String): it.name]
+        }
+        result ?: new HashMap()
+    }
+
     def Map<String, Object> getBlueprintMap(String id) throws Exception {
         def result = getBlueprint(id)?.collectEntries {
             if (it.key == "parameters") {
@@ -569,13 +590,7 @@ class CloudbreakClient {
 
     def Map<String, String> getStackMap(String id) throws Exception {
         def result = getStack(id)?.collectEntries {
-            if (it.key == "parameters") {
-                it.value.collectEntries {
-                    [(it.key as String): it.value as String]
-                }
-            } else {
-                [(it.key as String): it.value as String]
-            }
+            [(it.key as String): it.value as String]
         }
         result ?: new HashMap()
     }
@@ -648,6 +663,16 @@ class CloudbreakClient {
         return deleteOne(Resource.ACCOUNT_RECIPES, name)
     }
 
+    def Object deleteNetwork(String id) throws Exception {
+        log.debug("Delete network...")
+        return deleteOne(Resource.GLOBAL_NETWORKS, id)
+    }
+
+    def Object deleteNetworkByName(String name) throws Exception {
+        log.debug("Delete network...")
+        return deleteOne(Resource.ACCOUNT_NETWORKS, name)
+    }
+
     def Object getCluster(String id) throws Exception {
         log.debug("Getting cluster...")
         String path = Resource.CLUSTERS.path().replaceFirst("stack-id", id.toString())
@@ -697,6 +722,51 @@ class CloudbreakClient {
     def Object terminateStack(String id) throws Exception {
         log.debug("Terminate stack...")
         return deleteOne(Resource.GLOBAL_STACKS, id)
+    }
+
+    def Object getNetwork(String id) throws Exception {
+        log.debug("Getting network...")
+        return getOne(Resource.GLOBAL_NETWORKS, id)
+    }
+
+    def Object getNetworkByName(String name) throws Exception {
+        log.debug("Getting network by name...")
+        return getOne(Resource.ACCOUNT_NETWORKS, name)
+    }
+
+    def String postAzureNetwork(String name, String description, String subnetCIDR, String addressPrefixCIDR, Boolean publicInAccount) throws Exception {
+        log.debug("Posting Azure network ...")
+        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "SUBNET_CIDR": subnetCIDR, "ADDRESS_PREFIX_CIDR": addressPrefixCIDR]
+        return postNetwork(Resource.ACCOUNT_NETWORKS_AZURE, Resource.USER_NETWORKS_AZURE, binding, publicInAccount)
+    }
+
+    def String postAWSNetwork(String name, String description, String subnetCIDR, String vpcId, String internetGatewayId, Boolean publicInAccount) throws Exception {
+        log.debug("Posting AWS network ...")
+        def binding = ["CLOUD_PLATFORM": "AWS", "NAME": name, "DESCRIPTION": description, "SUBNET_CIDR": subnetCIDR, "VPC_ID": vpcId, "INTERNET_GATEWAY_ID": internetGatewayId]
+        return postNetwork(Resource.ACCOUNT_NETWORKS_AWS, Resource.USER_NETWORKS_AWS, binding, publicInAccount)
+    }
+
+    def String postGCPNetwork(String name, String description, String subnetCIDR, Boolean publicInAccount) throws Exception {
+        log.debug("Posting GCP network ...")
+        def binding = ["CLOUD_PLATFORM": "GCC", "NAME": name, "DESCRIPTION": description, "SUBNET_CIDR": subnetCIDR]
+        return postNetwork(Resource.ACCOUNT_NETWORKS_GCP, Resource.USER_NETWORKS_GCP, binding, publicInAccount)
+    }
+
+    def String postOpenStackNetwork(String name, String description, String subnetCIDR, String publicNetId, Boolean publicInAccount) throws Exception {
+        log.debug("Posting OpenStack network ...")
+        def binding = ["CLOUD_PLATFORM": "OPENSTACK", "NAME": name, "DESCRIPTION": description, "SUBNET_CIDR": subnetCIDR, "PUBLIC_NET_ID": publicNetId]
+        return postNetwork(Resource.ACCOUNT_NETWORKS_OPENSTACK, Resource.USER_NETWORKS_OPENSTACK, binding, publicInAccount)
+    }
+
+    def private String postNetwork(Resource accountResource, Resource userResource, Map binding, Boolean publicInAccount) {
+        def response;
+        if (publicInAccount) {
+            response = processPost(accountResource, binding)
+        } else {
+            response = processPost(userResource, binding)
+        }
+        log.debug("Got response: {}", response.data.id)
+        return response?.data?.id
     }
 
     def private List getAllAsList(Resource resource) throws Exception {
