@@ -10,5 +10,5 @@
       "adjustmentType" : "$ADJUSTMENTTYPE"
    },
    "instanceGroups": [$GROUPS],
-   "parameters" : {$PARAMETERS}
+   "networkId": $NETWORK_ID
 }

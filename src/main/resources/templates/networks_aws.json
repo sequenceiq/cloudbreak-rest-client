@@ -1,0 +1,10 @@
+{
+  "name":"$NAME",
+  "description":${DESCRIPTION == null ? 'null' : "\"$DESCRIPTION\""},
+  "subnetCIDR":"$SUBNET_CIDR",
+  "cloudPlatform":"$CLOUD_PLATFORM",
+  "parameters":{
+    "vpcId":${VPC_ID == null ? 'null' : "\"$VPC_ID\""},
+    "internetGatewayId":${INTERNET_GATEWAY_ID == null ? 'null' : "\"$INTERNET_GATEWAY_ID\""}
+  }
+}

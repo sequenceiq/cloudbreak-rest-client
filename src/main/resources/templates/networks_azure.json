@@ -1,0 +1,9 @@
+{
+  "name":"$NAME",
+  "description":${DESCRIPTION == null ? 'null' : "\"$DESCRIPTION\""},
+  "subnetCIDR":"$SUBNET_CIDR",
+  "cloudPlatform":"$CLOUD_PLATFORM",
+  "parameters":{
+    "addressPrefixCIDR":${ADDRESS_PREFIX_CIDR == null ? 'null' : "\"$ADDRESS_PREFIX_CIDR\""}
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name":"$NAME",
+  "description":${DESCRIPTION == null ? 'null' : "\"$DESCRIPTION\""},
+  "subnetCIDR":"$SUBNET_CIDR",
+  "cloudPlatform":"$CLOUD_PLATFORM",
+  "parameters":{
+    "publicNetId":${PUBLIC_NET_ID == null ? 'null' : "\"$PUBLIC_NET_ID\""}
+  }
+}
