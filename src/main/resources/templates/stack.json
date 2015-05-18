@@ -2,8 +2,6 @@
    "name":"$STACK_NAME",
    "credentialId":$CREDENTIAL_ID,
    "region": "$REGION",
-   "userName":"$USER_NAME",
-   "password":"$PASSWORD",
    "onFailureAction" : "$ON_FAILURE",
    "failurePolicy": {
       "threshold" : $THRESHOLD,

@@ -2,5 +2,8 @@
    "name":"$NAME",
    "blueprintId":$BLUEPRINT_ID,
    "description":"$DESCRIPTION",
-   "hostGroups":$HOSTGROUPS
+   "hostGroups":$HOSTGROUPS,
+   "userName": "$USERNAME",
+   "password": "$PASSWORD",
+   "ambariStackDetails": $STACK_DETAILS
 }
