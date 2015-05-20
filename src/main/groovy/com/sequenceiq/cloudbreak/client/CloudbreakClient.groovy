@@ -95,7 +95,7 @@ class CloudbreakClient {
         restClient.headers['Authorization'] = 'Bearer ' + token
     }
 
-    def String postStack(String stackName, String userName, String password, String credentialId, String region, Boolean publicInAccount, Map<String, Object> instanceGroupTemplates, String onFailure, Long threshold, String adjustmentType, String image = null, String networkId) throws Exception {
+    def String postStack(String stackName, String credentialId, String region, Boolean publicInAccount, Map<String, Object> instanceGroupTemplates, String onFailure, Long threshold, String adjustmentType, String image = null, String networkId) throws Exception {
         log.debug("Posting stack ...")
         StringBuilder group = new StringBuilder();
         for (Map.Entry<String, Object> map : instanceGroupTemplates.entrySet()) {
@@ -105,16 +105,14 @@ class CloudbreakClient {
         }
         def response;
         if (image == null || image == "") {
-            def binding = ["STACK_NAME"   : stackName,
-                           "CREDENTIAL_ID": credentialId,
-                           "REGION"       : region,
-                           "USER_NAME"    : userName,
-                           "PASSWORD"     : password,
-                           "ON_FAILURE"   : onFailure,
-                           "THRESHOLD"    : threshold,
-                           "ADJUSTMENTTYPE" : adjustmentType,
-                           "GROUPS"       : group.toString().substring(0, group.toString().length() - 1),
-                           "NETWORK_ID"   : networkId]
+            def binding = ["STACK_NAME"    : stackName,
+                           "CREDENTIAL_ID" : credentialId,
+                           "REGION"        : region,
+                           "ON_FAILURE"    : onFailure,
+                           "THRESHOLD"     : threshold,
+                           "ADJUSTMENTTYPE": adjustmentType,
+                           "GROUPS"        : group.toString().substring(0, group.toString().length() - 1),
+                           "NETWORK_ID"    : networkId]
             if (publicInAccount) {
                 response = processPost(Resource.ACCOUNT_STACKS, binding)
             } else {
@@ -124,9 +122,7 @@ class CloudbreakClient {
             def binding = ["STACK_NAME"   : stackName,
                            "CREDENTIAL_ID": credentialId,
                            "REGION"       : region,
-                           "USER_NAME"    : userName,
                            "IMAGE"        : image,
-                           "PASSWORD"     : password,
                            "ON_FAILURE"   : onFailure,
                            "THRESHOLD"    : threshold,
                            "ADJUSTMENTTYPE" : adjustmentType,
@@ -359,13 +355,35 @@ class CloudbreakClient {
         doPut(putCtx)
     }
 
-    def void postCluster(String name, Integer blueprintId, String description, Integer stackId, List<Map<String, Object>> hostGroups) throws Exception {
+    def void postCluster(String name, String userName, String password, Integer blueprintId, String description, Integer stackId, List<Map<String, Object>> hostGroups) throws Exception {
+        postCluster(name, userName, password, blueprintId, description, stackId, hostGroups, null, null, null, null, null, null, null, null)
+    }
+
+    def void postCluster(String name, String userName, String password, Integer blueprintId, String description, Integer stackId, List<Map<String, Object>> hostGroups,
+                         String stack, String version, String os, String stackRepoId, String stackBaseURL,
+                         String utilsRepoId, String utilsBaseURL, Boolean verify) throws Exception {
         log.debug("Posting cluster ...")
         String hostGroupsJson = new JsonBuilder(hostGroups).toPrettyString();
-        def binding = ["NAME": name,
-                       "BLUEPRINT_ID": blueprintId,
-                       "DESCRIPTION": description,
-                       "HOSTGROUPS": hostGroupsJson]
+        def stackDetails = null
+        if (stack) {
+            stackDetails = ["stack"       : stack,
+                            "version"     : version,
+                            "os"          : os,
+                            "stackRepoId" : stackRepoId,
+                            "stackBaseURL": stackBaseURL,
+                            "utilsRepoId" : utilsRepoId,
+                            "utilsBaseURL": utilsBaseURL,
+                            "verify"      : verify
+            ]
+        }
+        def binding = ["NAME"         : name,
+                       "BLUEPRINT_ID" : blueprintId,
+                       "DESCRIPTION"  : description,
+                       "HOSTGROUPS"   : hostGroupsJson,
+                       "USERNAME"     : userName,
+                       "PASSWORD"     : password,
+                       "STACK_DETAILS": new JsonBuilder(stackDetails).toPrettyString()
+        ]
         def json = createJson(Resource.CLUSTERS.template(), binding)
         String path = Resource.CLUSTERS.path().replaceFirst("stack-id", stackId.toString())
         def Map postCtx = createPostRequestContext(path, ['json': json])

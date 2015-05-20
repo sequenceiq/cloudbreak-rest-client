@@ -2,8 +2,6 @@
    "name":"$STACK_NAME",
    "credentialId":$CREDENTIAL_ID,
    "region": "$REGION",
-   "userName":"$USER_NAME",
-   "password":"$PASSWORD",
    "image":"$IMAGE",
    "instanceGroups": [$GROUPS]
 }
