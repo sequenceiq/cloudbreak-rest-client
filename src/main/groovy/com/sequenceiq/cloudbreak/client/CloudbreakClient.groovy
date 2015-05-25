@@ -15,25 +15,25 @@ class CloudbreakClient {
         USER_CREDENTIALS("user/credentials", "credentials.json"),
         USER_CREDENTIALS_EC2("user/credentials", "credentials_ec2.json"),
         USER_CREDENTIALS_AZURE("user/credentials", "credentials_azure.json"),
-        USER_CREDENTIALS_GCC("user/credentials", "credentials_gcc.json"),
+        USER_CREDENTIALS_GCP("user/credentials", "credentials_gcp.json"),
         USER_CREDENTIALS_OPENSTACK("user/credentials", "credentials_openstack.json"),
         ACCOUNT_CREDENTIALS("account/credentials", "credentials.json"),
         ACCOUNT_CREDENTIALS_EC2("account/credentials", "credentials_ec2.json"),
         ACCOUNT_CREDENTIALS_OPENSTACK("account/credentials", "credentials_openstack.json"),
         ACCOUNT_CREDENTIALS_AZURE("account/credentials", "credentials_azure.json"),
-        ACCOUNT_CREDENTIALS_GCC("account/credentials", "credentials_gcc.json"),
+        ACCOUNT_CREDENTIALS_GCP("account/credentials", "credentials_gcp.json"),
         GLOBAL_CREDENTIALS("credentials", ""),
         USER_TEMPLATES("user/templates", "template.json"),
         USER_TEMPLATES_EC2("user/templates", "template_ec2.json"),
         USER_TEMPLATES_EC2_SPOT("user/templates", "template_spot_ec2.json"),
-        USER_TEMPLATES_GCC("user/templates", "template_gcc.json"),
+        USER_TEMPLATES_GCP("user/templates", "template_gcp.json"),
         USER_TEMPLATES_AZURE("user/templates", "template_azure.json"),
         USER_TEMPLATES_OPENSTACK("user/templates", "template_openstack.json"),
         ACCOUNT_TEMPLATES("account/templates", "template.json"),
         ACCOUNT_TEMPLATES_EC2("account/templates", "template_ec2.json"),
         ACCOUNT_TEMPLATES_EC2_SPOT("account/templates", "template_spot_ec2.json"),
         ACCOUNT_TEMPLATES_AZURE("account/templates", "template_azure.json"),
-        ACCOUNT_TEMPLATES_GCC("account/templates", "template_gcc.json"),
+        ACCOUNT_TEMPLATES_GCP("account/templates", "template_gcp.json"),
         ACCOUNT_TEMPLATES_OPENSTACK("account/templates", "template_openstack.json"),
         GLOBAL_TEMPLATES("templates", ""),
         USER_STACKS("user/stacks", "stack.json"),
@@ -189,14 +189,14 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postGccCredential(String name, String description, String sshKey, Boolean publicInAccount, String projectId, String serviceAccountId, String serviceAccountPrivateKey) throws Exception {
+    def String postGcpCredential(String name, String description, String sshKey, Boolean publicInAccount, String projectId, String serviceAccountId, String serviceAccountPrivateKey) throws Exception {
         log.debug("Posting credential ...")
-        def binding = ["CLOUD_PLATFORM": "GCC", "NAME": name, "PROJECT_ID": projectId, "DESCRIPTION": description, "SSHKEY": sshKey, "SERVICE_ACCOUNT_ID": serviceAccountId, "SERVICE_ACCOUNT_PRIVATE_KEY": serviceAccountPrivateKey]
+        def binding = ["CLOUD_PLATFORM": "GCP", "NAME": name, "PROJECT_ID": projectId, "DESCRIPTION": description, "SSHKEY": sshKey, "SERVICE_ACCOUNT_ID": serviceAccountId, "SERVICE_ACCOUNT_PRIVATE_KEY": serviceAccountPrivateKey]
         def response;
         if (publicInAccount) {
-            response = processPost(Resource.ACCOUNT_CREDENTIALS_GCC, binding)
+            response = processPost(Resource.ACCOUNT_CREDENTIALS_GCP, binding)
         } else {
-            response = processPost(Resource.USER_CREDENTIALS_GCC, binding)
+            response = processPost(Resource.USER_CREDENTIALS_GCP, binding)
         }
         return response?.data?.id
     }
@@ -244,14 +244,14 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postGccTemplate(String name, String description, String gccInstanceType, String gccVolumeType = "HDD", String volumeCount, String volumeSize, Boolean publicInAccount) throws Exception {
+    def String postGcpTemplate(String name, String description, String gcpInstanceType, String gcpVolumeType = "HDD", String volumeCount, String volumeSize, Boolean publicInAccount) throws Exception {
         log.debug("testing credential ...")
-        def binding = ["CLOUD_PLATFORM": "GCC", "NAME": name, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "GCC_INSTANCE_TYPE": gccInstanceType, "GCC_VOLUME_TYPE": gccVolumeType]
+        def binding = ["CLOUD_PLATFORM": "GCP", "NAME": name, "DESCRIPTION": description, "VOLUME_COUNT": volumeCount, "VOLUME_SIZE": volumeSize, "GCP_INSTANCE_TYPE": gcpInstanceType, "GCP_VOLUME_TYPE": gcpVolumeType]
         def response;
         if (publicInAccount) {
-            response = processPost(Resource.ACCOUNT_TEMPLATES_GCC, binding)
+            response = processPost(Resource.ACCOUNT_TEMPLATES_GCP, binding)
         } else {
-            response = processPost(Resource.USER_TEMPLATES_GCC, binding)
+            response = processPost(Resource.USER_TEMPLATES_GCP, binding)
         }
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
@@ -766,7 +766,7 @@ class CloudbreakClient {
 
     def String postGCPNetwork(String name, String description, String subnetCIDR, Boolean publicInAccount) throws Exception {
         log.debug("Posting GCP network ...")
-        def binding = ["CLOUD_PLATFORM": "GCC", "NAME": name, "DESCRIPTION": description, "SUBNET_CIDR": subnetCIDR]
+        def binding = ["CLOUD_PLATFORM": "GCP", "NAME": name, "DESCRIPTION": description, "SUBNET_CIDR": subnetCIDR]
         return postNetwork(Resource.ACCOUNT_NETWORKS_GCP, Resource.USER_NETWORKS_GCP, binding, publicInAccount)
     }
 
