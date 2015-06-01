@@ -95,7 +95,8 @@ class CloudbreakClient {
         restClient.headers['Authorization'] = 'Bearer ' + token
     }
 
-    def String postStack(String stackName, String credentialId, String region, Boolean publicInAccount, Map<String, Object> instanceGroupTemplates, String onFailure, Long threshold, String adjustmentType, String image = null, String networkId) throws Exception {
+    def String postStack(String stackName, String credentialId, String region, Boolean publicInAccount, Map<String, Object> instanceGroupTemplates,
+                         String onFailure, Long threshold, String adjustmentType, String image = null, String networkId, Integer diskPerStorage = null) throws Exception {
         log.debug("Posting stack ...")
         StringBuilder group = new StringBuilder();
         for (Map.Entry<String, Object> map : instanceGroupTemplates.entrySet()) {
@@ -104,6 +105,7 @@ class CloudbreakClient {
             group.append("},");
         }
         def response;
+        def params = diskPerStorage == null ? null : ["diskPerStorage": diskPerStorage]
         if (image == null || image == "") {
             def binding = ["STACK_NAME"    : stackName,
                            "CREDENTIAL_ID" : credentialId,
@@ -112,22 +114,24 @@ class CloudbreakClient {
                            "THRESHOLD"     : threshold,
                            "ADJUSTMENTTYPE": adjustmentType,
                            "GROUPS"        : group.toString().substring(0, group.toString().length() - 1),
-                           "NETWORK_ID"    : networkId]
+                           "NETWORK_ID"    : networkId,
+                           "PARAMETERS"    : new JsonBuilder(params).toPrettyString()]
             if (publicInAccount) {
                 response = processPost(Resource.ACCOUNT_STACKS, binding)
             } else {
                 response = processPost(Resource.USER_STACKS, binding)
             }
         } else {
-            def binding = ["STACK_NAME"   : stackName,
-                           "CREDENTIAL_ID": credentialId,
-                           "REGION"       : region,
-                           "IMAGE"        : image,
-                           "ON_FAILURE"   : onFailure,
-                           "THRESHOLD"    : threshold,
-                           "ADJUSTMENTTYPE" : adjustmentType,
-                           "GROUPS"       : group.toString().substring(0, group.toString().length() - 1),
-                           "NETWORK_ID"   : networkId]
+            def binding = ["STACK_NAME"    : stackName,
+                           "CREDENTIAL_ID" : credentialId,
+                           "REGION"        : region,
+                           "IMAGE"         : image,
+                           "ON_FAILURE"    : onFailure,
+                           "THRESHOLD"     : threshold,
+                           "ADJUSTMENTTYPE": adjustmentType,
+                           "GROUPS"        : group.toString().substring(0, group.toString().length() - 1),
+                           "NETWORK_ID"    : networkId,
+                           "PARAMETERS"    : new JsonBuilder(params).toPrettyString()]
             if (publicInAccount) {
                 response = processPost(Resource.ACCOUNT_STACKS_WITH_IMAGE, binding)
             } else {

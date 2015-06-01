@@ -3,5 +3,6 @@
    "credentialId":$CREDENTIAL_ID,
    "region": "$REGION",
    "image":"$IMAGE",
-   "instanceGroups": [$GROUPS]
+   "instanceGroups": [$GROUPS],
+   "parameters": $PARAMETERS
 }
