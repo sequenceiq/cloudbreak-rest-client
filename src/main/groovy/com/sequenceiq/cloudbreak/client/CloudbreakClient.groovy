@@ -96,7 +96,8 @@ class CloudbreakClient {
     }
 
     def String postStack(String stackName, String credentialId, String region, Boolean publicInAccount, Map<String, Object> instanceGroupTemplates,
-                         String onFailure, Long threshold, String adjustmentType, String image = null, String networkId, Integer diskPerStorage = null) throws Exception {
+                         String onFailure, Long threshold, String adjustmentType, String image = null, String networkId, Integer diskPerStorage = null,
+                         Boolean dedicatedInstances = null) throws Exception {
         log.debug("Posting stack ...")
         StringBuilder group = new StringBuilder();
         for (Map.Entry<String, Object> map : instanceGroupTemplates.entrySet()) {
@@ -105,7 +106,11 @@ class CloudbreakClient {
             group.append("},");
         }
         def response;
-        def params = diskPerStorage == null ? null : ["diskPerStorage": diskPerStorage]
+        def params = diskPerStorage == null ? [:] : ["diskPerStorage": diskPerStorage]
+        if (dedicatedInstances) {
+            params << ["dedicatedInstances": dedicatedInstances]
+        };
+
         if (image == null || image == "") {
             def binding = ["STACK_NAME"    : stackName,
                            "CREDENTIAL_ID" : credentialId,
