@@ -96,7 +96,7 @@ class CloudbreakClient {
     }
 
     def String postStack(String stackName, String credentialId, String region, Boolean publicInAccount, Map<String, Object> instanceGroupTemplates,
-                         String onFailure, Long threshold, String adjustmentType, String image = null, String networkId, Integer diskPerStorage = null,
+                         String onFailure, Long threshold, String adjustmentType, String image = null, String networkId, String securityGroupId, Integer diskPerStorage = null,
                          Boolean dedicatedInstances = null) throws Exception {
         log.debug("Posting stack ...")
         StringBuilder group = new StringBuilder();
@@ -120,6 +120,7 @@ class CloudbreakClient {
                            "ADJUSTMENTTYPE": adjustmentType,
                            "GROUPS"        : group.toString().substring(0, group.toString().length() - 1),
                            "NETWORK_ID"    : networkId,
+                           "SECURITY_GROUP": securityGroupId,
                            "PARAMETERS"    : new JsonBuilder(params).toPrettyString()]
             if (publicInAccount) {
                 response = processPost(Resource.ACCOUNT_STACKS, binding)
@@ -136,6 +137,7 @@ class CloudbreakClient {
                            "ADJUSTMENTTYPE": adjustmentType,
                            "GROUPS"        : group.toString().substring(0, group.toString().length() - 1),
                            "NETWORK_ID"    : networkId,
+                           "SECURITY_GROUP": securityGroupId,
                            "PARAMETERS"    : new JsonBuilder(params).toPrettyString()]
             if (publicInAccount) {
                 response = processPost(Resource.ACCOUNT_STACKS_WITH_IMAGE, binding)
