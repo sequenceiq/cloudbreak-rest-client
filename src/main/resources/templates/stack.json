@@ -9,5 +9,6 @@
    },
    "instanceGroups": [$GROUPS],
    "networkId": $NETWORK_ID,
-   "parameters": $PARAMETERS
+   "parameters": $PARAMETERS,
+   "securityGroupId": $SECURITY_GROUP
 }

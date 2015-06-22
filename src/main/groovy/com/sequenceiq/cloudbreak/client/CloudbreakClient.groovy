@@ -64,7 +64,10 @@ class CloudbreakClient {
         ACCOUNT_NETWORKS_AZURE("account/networks", "networks_azure.json"),
         ACCOUNT_NETWORKS_OPENSTACK("account/networks", "networks_openstack.json"),
         ACCOUNT_NETWORKS_GCP("account/networks", "networks_gcp.json"),
-        GLOBAL_NETWORKS("networks", "")
+        GLOBAL_NETWORKS("networks", ""),
+        USER_SECURITY_GROUPS("user/securitygroups", ""),
+        ACCOUNT_SECURITY_GROUPS("account/securitygroups", ""),
+        GLOBAL_SECURITY_GROUPS("securitygroups", "")
 
         def path
         def template
@@ -96,7 +99,7 @@ class CloudbreakClient {
     }
 
     def String postStack(String stackName, String credentialId, String region, Boolean publicInAccount, Map<String, Object> instanceGroupTemplates,
-                         String onFailure, Long threshold, String adjustmentType, String image = null, String networkId, Integer diskPerStorage = null,
+                         String onFailure, Long threshold, String adjustmentType, String image = null, String networkId, String securityGroupId, Integer diskPerStorage = null,
                          Boolean dedicatedInstances = null) throws Exception {
         log.debug("Posting stack ...")
         StringBuilder group = new StringBuilder();
@@ -120,6 +123,7 @@ class CloudbreakClient {
                            "ADJUSTMENTTYPE": adjustmentType,
                            "GROUPS"        : group.toString().substring(0, group.toString().length() - 1),
                            "NETWORK_ID"    : networkId,
+                           "SECURITY_GROUP": securityGroupId,
                            "PARAMETERS"    : new JsonBuilder(params).toPrettyString()]
             if (publicInAccount) {
                 response = processPost(Resource.ACCOUNT_STACKS, binding)
@@ -136,6 +140,7 @@ class CloudbreakClient {
                            "ADJUSTMENTTYPE": adjustmentType,
                            "GROUPS"        : group.toString().substring(0, group.toString().length() - 1),
                            "NETWORK_ID"    : networkId,
+                           "SECURITY_GROUP": securityGroupId,
                            "PARAMETERS"    : new JsonBuilder(params).toPrettyString()]
             if (publicInAccount) {
                 response = processPost(Resource.ACCOUNT_STACKS_WITH_IMAGE, binding)
@@ -501,6 +506,23 @@ class CloudbreakClient {
         result ?: new HashMap()
     }
 
+    def List<Map> getPrivateSecurityGroups() throws Exception {
+        log.debug("Getting networks...")
+        getAllAsList(Resource.USER_SECURITY_GROUPS)
+    }
+
+    def List<Map> getAccountSecurityGroups() throws Exception {
+        log.debug("Getting security groups...")
+        getAllAsList(Resource.ACCOUNT_SECURITY_GROUPS)
+    }
+
+    def Map<String, String> getAccountSecurityGroupsMap() throws Exception {
+        def result = getAccountSecurityGroups()?.collectEntries {
+            [(it.id as String): it.name]
+        }
+        result ?: new HashMap()
+    }
+
     def Map<String, Object> getBlueprintMap(String id) throws Exception {
         def result = getBlueprint(id)?.collectEntries {
             if (it.key == "parameters") {
@@ -700,6 +722,16 @@ class CloudbreakClient {
         return deleteOne(Resource.ACCOUNT_NETWORKS, name)
     }
 
+    def Object deleteSecurityGroup(String id) throws Exception {
+        log.debug("Delete security group...")
+        return deleteOne(Resource.GLOBAL_SECURITY_GROUPS, id)
+    }
+
+    def Object deleteSecurityGroupByName(String name) throws Exception {
+        log.debug("Delete security group...")
+        return deleteOne(Resource.ACCOUNT_SECURITY_GROUPS, name)
+    }
+
     def Object getCluster(String id) throws Exception {
         log.debug("Getting cluster...")
         String path = Resource.CLUSTERS.path().replaceFirst("stack-id", id.toString())
@@ -759,6 +791,16 @@ class CloudbreakClient {
     def Object getNetworkByName(String name) throws Exception {
         log.debug("Getting network by name...")
         return getOne(Resource.ACCOUNT_NETWORKS, name)
+    }
+
+    def Object getSecurityGroup(String id) throws Exception {
+        log.debug("Getting security group by id...")
+        return getOne(Resource.GLOBAL_SECURITY_GROUPS, id)
+    }
+
+    def Object getSecurityGroupByName(String name) throws Exception {
+        log.debug("Getting security group by name...")
+        return getOne(Resource.ACCOUNT_SECURITY_GROUPS, name)
     }
 
     def String postAzureNetwork(String name, String description, String subnetCIDR, String addressPrefixCIDR, Boolean publicInAccount) throws Exception {
