@@ -229,7 +229,7 @@ class CloudbreakClient {
     }
 
     def String getCertificate(String id) throws Exception {
-        return getOne(Resource.CERTIFICATE, id).text
+        return getOne(Resource.CERTIFICATES, id).text
     }
 
     def String postSpotEc2Template(String name, String description, String sshLocation, String instanceType, String volumeCount, String volumeSize, String volumeType, String spotPrice, Boolean publicInAccount, Boolean encrypted) throws Exception {
@@ -351,6 +351,13 @@ class CloudbreakClient {
 
     def String getStackStatus(int stackId) {
         getFullStackStatus(stackId)?.status
+    }
+
+    def byte[] getStackCertificate(Long stackId) {
+        String path = "${Resource.GLOBAL_STACKS.path()}/$stackId/certificate"
+        def context = createGetRequestContext(path)
+        def resp = doGet(context)
+        return resp.data.certificate.decodeBase64()
     }
 
     def void putStack(int stackId, String instanceGroup, int adjustment, Boolean withClusterUpdate = false) {
