@@ -6,7 +6,7 @@
    "userName": "$USERNAME",
    "password": "$PASSWORD",
    "ambariStackDetails":$STACK_DETAILS,
-   "secure":$SECURE,
+   "enableSecurity":$ENABLE_SECURITY,
    "kerberosMasterKey":"$KERBEROS_MASTER_KEY",
    "kerberosAdmin":"$KERBEROS_ADMIN",
    "kerberosPassword":"$KERBEROS_PASSWORD"
