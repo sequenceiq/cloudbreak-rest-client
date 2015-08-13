@@ -5,5 +5,9 @@
    "hostGroups":$HOSTGROUPS,
    "userName": "$USERNAME",
    "password": "$PASSWORD",
-   "ambariStackDetails": $STACK_DETAILS
+   "ambariStackDetails":$STACK_DETAILS,
+   "enableSecurity":$ENABLE_SECURITY,
+   "kerberosMasterKey":"$KERBEROS_MASTER_KEY",
+   "kerberosAdmin":"$KERBEROS_ADMIN",
+   "kerberosPassword":"$KERBEROS_PASSWORD"
 }
