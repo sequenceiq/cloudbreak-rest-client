@@ -413,9 +413,9 @@ class CloudbreakClient {
                        "PASSWORD"     : password,
                        "STACK_DETAILS": new JsonBuilder(stackDetails).toPrettyString(),
                        "ENABLE_SECURITY": enableSecurity,
-                       "KERBEROS_MASTER_KEY": kerberosMasterKey,
-                       "KERBEROS_ADMIN": kerberosAdmin,
-                       "KERBEROS_PASSWORD": kerberosPassword
+                       "KERBEROS_MASTER_KEY": kerberosMasterKey ? "\"$kerberosMasterKey\"" : null,
+                       "KERBEROS_ADMIN": kerberosAdmin ? "\"$kerberosAdmin\"" : null,
+                       "KERBEROS_PASSWORD": kerberosPassword ? "\"$kerberosPassword\"" : null,
         ]
         def json = createJson(Resource.CLUSTERS.template(), binding)
         String path = Resource.CLUSTERS.path().replaceFirst("stack-id", stackId.toString())
