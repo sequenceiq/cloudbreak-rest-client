@@ -15,12 +15,14 @@ class CloudbreakClient {
         USER_CREDENTIALS("user/credentials", "credentials.json"),
         USER_CREDENTIALS_EC2("user/credentials", "credentials_ec2.json"),
         USER_CREDENTIALS_AZURE("user/credentials", "credentials_azure.json"),
+        USER_CREDENTIALS_AZURE_RM("user/credentials", "credentials_azure_rm.json"),
         USER_CREDENTIALS_GCP("user/credentials", "credentials_gcp.json"),
         USER_CREDENTIALS_OPENSTACK("user/credentials", "credentials_openstack.json"),
         ACCOUNT_CREDENTIALS("account/credentials", "credentials.json"),
         ACCOUNT_CREDENTIALS_EC2("account/credentials", "credentials_ec2.json"),
         ACCOUNT_CREDENTIALS_OPENSTACK("account/credentials", "credentials_openstack.json"),
         ACCOUNT_CREDENTIALS_AZURE("account/credentials", "credentials_azure.json"),
+        ACCOUNT_CREDENTIALS_AZURE_RM("account/credentials", "credentials_azure_rm.json"),
         ACCOUNT_CREDENTIALS_GCP("account/credentials", "credentials_gcp.json"),
         GLOBAL_CREDENTIALS("credentials", ""),
         USER_TEMPLATES("user/templates", "template.json"),
@@ -223,6 +225,19 @@ class CloudbreakClient {
             response = processPost(Resource.ACCOUNT_CREDENTIALS_AZURE, binding)
         } else {
             response = processPost(Resource.USER_CREDENTIALS_AZURE, binding)
+        }
+        log.debug("Got response: {}", response.data.id)
+        return response?.data?.id
+    }
+
+    def String postAzureRmCredential(String name, String description, String subscriptionId, String tenantId, String accesKey, String secretKey, String sshKey, Boolean publicInAccount) throws Exception {
+        log.debug("Posting credential ...")
+        def binding = ["CLOUD_PLATFORM": "AZURE_RM", "NAME": name, "DESCRIPTION": description, "SUBSCRIPTIONID": subscriptionId, "SECRETKEY": secretKey, "TENANTID": tenantId, "ACCESKEY": accesKey, "SSHKEY": sshKey]
+        def response;
+        if (publicInAccount) {
+            response = processPost(Resource.ACCOUNT_CREDENTIALS_AZURE_RM, binding)
+        } else {
+            response = processPost(Resource.USER_CREDENTIALS_AZURE_RM, binding)
         }
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
