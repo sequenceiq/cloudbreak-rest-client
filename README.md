@@ -8,4 +8,4 @@ Cloudbreak REST client
 
 Cloudbreak Groovy client - a REST client used by the Cloudbreak Shell to launch on demand clusters. Any JVM based application can interect with Cloudbreak using the REST client - a simpler and embeddable way than calling the REST API directly.
 
-Cloudbreak [API documentation](http://docs.cloudbreak.apiary.io/).
+Cloudbreak [API documentation](https://cloudbreak-api.sequenceiq.com/api/index.html).
