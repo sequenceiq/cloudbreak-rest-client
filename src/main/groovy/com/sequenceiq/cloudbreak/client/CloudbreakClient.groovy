@@ -55,6 +55,8 @@ class CloudbreakClient {
         CERTIFICATES("credentials/certificate", "certificate.json"),
         ACCOUNT_RECIPES("account/recipes", "recipe.json"),
         USER_RECIPES("user/recipes", "recipe.json"),
+        STORED_ACCOUNT_RECIPES("stored/account/recipes", "stored_recipe.json"),
+        STORED_USER_RECIPES("stored/user/recipes", "stored_recipe.json"),
         GLOBAL_RECIPES("recipes", ""),
         USER_NETWORKS("user/networks", ""),
         USER_NETWORKS_AWS("user/networks", "networks_aws.json"),
@@ -166,6 +168,25 @@ class CloudbreakClient {
         }
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
+    }
+
+    def String postStoredRecipe(String name, String description, String preInstallScript, String postInstallScript, String executionType, Boolean publicInAccount) throws Exception {
+      log.debug("Posting recipe to account...")
+      def binding = [
+              "NAME": getJsonEscapedValue(name),
+              "DESCRIPTION": getJsonEscapedValue(description),
+              "PRE_INSTALL_SCRIPT": getJsonEscapedValue(preInstallScript),
+              "POST_INSTALL_SCRIPT": getJsonEscapedValue(postInstallScript),
+              "EXECUTION_TYPE": getJsonEscapedValue(executionType),
+      ]
+      def response;
+      if (publicInAccount) {
+        response = processPost(Resource.STORED_ACCOUNT_RECIPES, binding)
+      } else {
+        response = processPost(Resource.STORED_USER_RECIPES, binding)
+      }
+      log.debug("Got response: {}", response.data.id)
+      return response?.data?.id
     }
 
     def String postRecipe(String recipe, Boolean publicInAccount) throws Exception {
@@ -962,5 +983,9 @@ class CloudbreakClient {
 
     private int getStackId(String ambari) {
         getPrivateStacks().find { it.ambariServerIp.equals(ambari) }?.id
+    }
+
+    private String getJsonEscapedValue(String input) {
+        input ? "\"${input.replaceAll('"', '\\\\"')}\"" : null
     }
 }

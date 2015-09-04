@@ -1,0 +1,7 @@
+{
+  "name" : $NAME,
+  "description" : $DESCRIPTION,
+  "preInstallScript" : $PRE_INSTALL_SCRIPT,
+  "postInstallScript" : $POST_INSTALL_SCRIPT,
+  "executionType" : $EXECUTION_TYPE
+}
