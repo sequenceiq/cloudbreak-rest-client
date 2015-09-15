@@ -397,40 +397,55 @@ class CloudbreakClient {
 
     def void postCluster(String name, String userName, String password, Integer blueprintId, String description, Integer stackId, List<Map<String, Object>> hostGroups,
                          Boolean enableSecurity, String kerberosMasterKey, String kerberosAdmin, String kerberosPassword) throws Exception {
-      postCluster(name, userName, password, blueprintId, description, stackId, hostGroups,
-          null, null, null, null, null, null, null, null,
-          enableSecurity, kerberosMasterKey, kerberosAdmin, kerberosPassword)
+        postCluster(name, userName, password, blueprintId, description, stackId, hostGroups, null, null, null, null, null, null, null, null, enableSecurity, kerberosMasterKey, kerberosAdmin, kerberosPassword)
     }
 
     def void postCluster(String name, String userName, String password, Integer blueprintId, String description, Integer stackId, List<Map<String, Object>> hostGroups,
                          String stack, String version, String os, String stackRepoId, String stackBaseURL,
                          String utilsRepoId, String utilsBaseURL, Boolean verify,
                          Boolean enableSecurity = false, String kerberosMasterKey = null, String kerberosAdmin = null, String kerberosPassword = null) throws Exception {
+        postCluster(name, userName, password, blueprintId, description, stackId, hostGroups, stack, version, os, stackRepoId, stackBaseURL, utilsRepoId, utilsBaseURL, verify, enableSecurity, kerberosMasterKey, kerberosAdmin, kerberosPassword, null, null, null)
+    }
+
+    def void postCluster(String name, String userName, String password, Integer blueprintId, String description, Integer stackId, List<Map<String, Object>> hostGroups,
+                         String stack, String version, String os, String stackRepoId, String stackBaseURL,
+                         String utilsRepoId, String utilsBaseURL, Boolean verify,
+                         Boolean enableSecurity, String kerberosMasterKey, String kerberosAdmin, String kerberosPassword,
+                         String fileSytemType, Map<String, Object> properties, Boolean defaultFs) throws Exception {
         log.debug("Posting cluster ...")
         String hostGroupsJson = new JsonBuilder(hostGroups).toPrettyString();
         def stackDetails = null
+        def fileSystem = null
+        if (fileSytemType) {
+          fileSystem = ["name"        : name,
+                      "type"        : fileSytemType,
+                      "defaultFs"   : defaultFs,
+                      "properties"  : properties
+          ]
+        }
         if (stack) {
-            stackDetails = ["stack"       : stack,
-                            "version"     : version,
-                            "os"          : os,
-                            "stackRepoId" : stackRepoId,
-                            "stackBaseURL": stackBaseURL,
-                            "utilsRepoId" : utilsRepoId,
-                            "utilsBaseURL": utilsBaseURL,
-                            "verify"      : verify
-            ]
+          stackDetails = ["stack"       : stack,
+                        "version"     : version,
+                        "os"          : os,
+                        "stackRepoId" : stackRepoId,
+                        "stackBaseURL": stackBaseURL,
+                        "utilsRepoId" : utilsRepoId,
+                        "utilsBaseURL": utilsBaseURL,
+                        "verify"      : verify
+          ]
         }
         def binding = ["NAME"         : name,
-                       "BLUEPRINT_ID" : blueprintId,
-                       "DESCRIPTION"  : description,
-                       "HOSTGROUPS"   : hostGroupsJson,
-                       "USERNAME"     : userName,
-                       "PASSWORD"     : password,
-                       "STACK_DETAILS": new JsonBuilder(stackDetails).toPrettyString(),
-                       "ENABLE_SECURITY": enableSecurity,
-                       "KERBEROS_MASTER_KEY": kerberosMasterKey ? "\"$kerberosMasterKey\"" : null,
-                       "KERBEROS_ADMIN": kerberosAdmin ? "\"$kerberosAdmin\"" : null,
-                       "KERBEROS_PASSWORD": kerberosPassword ? "\"$kerberosPassword\"" : null,
+                     "BLUEPRINT_ID" : blueprintId,
+                     "DESCRIPTION"  : description,
+                     "HOSTGROUPS"   : hostGroupsJson,
+                     "USERNAME"     : userName,
+                     "PASSWORD"     : password,
+                     "STACK_DETAILS": new JsonBuilder(stackDetails).toPrettyString(),
+                     "FILESYSTEM": new JsonBuilder(fileSystem).toPrettyString(),
+                     "ENABLE_SECURITY": enableSecurity,
+                     "KERBEROS_MASTER_KEY": kerberosMasterKey ? "\"$kerberosMasterKey\"" : null,
+                     "KERBEROS_ADMIN": kerberosAdmin ? "\"$kerberosAdmin\"" : null,
+                     "KERBEROS_PASSWORD": kerberosPassword ? "\"$kerberosPassword\"" : null,
         ]
         def json = createJson(Resource.CLUSTERS.template(), binding)
         String path = Resource.CLUSTERS.path().replaceFirst("stack-id", stackId.toString())
