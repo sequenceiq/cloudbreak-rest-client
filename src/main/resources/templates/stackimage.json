@@ -4,5 +4,6 @@
    "region": "$REGION",
    "image":"$IMAGE",
    "instanceGroups": [$GROUPS],
+   "platformVariant": "$PLATFORM_VARIANT",
    "parameters": $PARAMETERS
 }
