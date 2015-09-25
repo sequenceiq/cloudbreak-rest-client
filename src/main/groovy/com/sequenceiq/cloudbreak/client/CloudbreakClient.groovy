@@ -45,6 +45,7 @@ class CloudbreakClient {
         GLOBAL_STACKS_NODECOUNT_PUT("stacks", "stack_nodecount_put.json"),
         GLOBAL_STACKS_STATUS_PUT("stacks", "stack_status_put.json"),
         GLOBAL_STACKS("stacks", ""),
+        GLOBAL_STACKS_PLATFORM_VARIANT("stacks/platformVariants", ""),
         STACK_AMBARI("stacks/ambari", ""),
         USER_BLUEPRINTS("user/blueprints", "blueprint.json"),
         ACCOUNT_BLUEPRINTS("account/blueprints", "blueprint.json"),
@@ -876,6 +877,11 @@ class CloudbreakClient {
         log.debug("Posting OpenStack network ...")
         def binding = ["CLOUD_PLATFORM": "OPENSTACK", "NAME": name, "DESCRIPTION": description, "SUBNET_CIDR": subnetCIDR, "PUBLIC_NET_ID": publicNetId]
         return postNetwork(Resource.ACCOUNT_NETWORKS_OPENSTACK, Resource.USER_NETWORKS_OPENSTACK, binding, publicInAccount)
+    }
+
+    def Object getPlatformVariants() {
+      Map getCtx = createGetRequestContext(Resource.GLOBAL_STACKS_PLATFORM_VARIANT.path())
+      return doGet(getCtx)?.data
     }
 
     def private String postNetwork(Resource accountResource, Resource userResource, Map binding, Boolean publicInAccount) {
