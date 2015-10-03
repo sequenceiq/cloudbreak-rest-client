@@ -895,6 +895,17 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
+    def String postSecurityGroup(String name, String description, List<Map<String, String>> securityRules, Boolean publicInAccount) {
+        def rulesRequest = [
+                "name": name,
+                "description": description == null ? "null" : description,
+                "securityRules": securityRules
+        ]
+        def resource = publicInAccount ? Resource.ACCOUNT_SECURITY_GROUPS : Resource.USER_SECURITY_GROUPS
+        def postCtx = createPostRequestContext(resource.path(), ['json': new JsonBuilder(rulesRequest).toPrettyString()])
+        return doPost(postCtx)
+    }
+
     def private List getAllAsList(Resource resource) throws Exception {
         Map getCtx = createGetRequestContext(resource.path());
         Object response = doGet(getCtx);
