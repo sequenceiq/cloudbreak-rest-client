@@ -898,7 +898,7 @@ class CloudbreakClient {
     def String postSecurityGroup(String name, String description, List<Map<String, String>> securityRules, Boolean publicInAccount) {
         def rulesRequest = [
                 "name": name,
-                "description": description == null ? "null" : description,
+                "description": description,
                 "securityRules": securityRules
         ]
         def resource = publicInAccount ? Resource.ACCOUNT_SECURITY_GROUPS : Resource.USER_SECURITY_GROUPS
