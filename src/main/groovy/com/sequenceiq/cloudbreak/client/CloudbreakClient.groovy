@@ -895,7 +895,7 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postSecurityGroup(String name, String description, List<Map<String, String>> securityRules, Boolean publicInAccount) {
+    def String postSecurityGroup(String name, String description, List<Map<String, String>> securityRules, Boolean publicInAccount) throws Exception {
         def rulesRequest = [
                 "name": name,
                 "description": description,
