@@ -903,7 +903,8 @@ class CloudbreakClient {
         ]
         def resource = publicInAccount ? Resource.ACCOUNT_SECURITY_GROUPS : Resource.USER_SECURITY_GROUPS
         def postCtx = createPostRequestContext(resource.path(), ['json': new JsonBuilder(rulesRequest).toPrettyString()])
-        return doPost(postCtx)
+        def response = doPost(postCtx)
+        return response?.data?.id
     }
 
     def private List getAllAsList(Resource resource) throws Exception {
