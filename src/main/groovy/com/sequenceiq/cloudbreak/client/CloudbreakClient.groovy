@@ -103,7 +103,7 @@ class CloudbreakClient {
 
     def String postStack(String stackName, String credentialId, String region, Boolean publicInAccount, Map<String, Object> instanceGroupTemplates,
                          String onFailure, Long threshold, String adjustmentType, String image = null, String networkId, String securityGroupId, Integer diskPerStorage = null,
-                         Boolean dedicatedInstances = null, String platformVariant = "") throws Exception {
+                         Boolean dedicatedInstances = null, String platformVariant = "", String availabilityZone = null) throws Exception {
         log.debug("Posting stack ...")
         StringBuilder group = new StringBuilder();
         for (Map.Entry<String, Object> map : instanceGroupTemplates.entrySet()) {
@@ -118,35 +118,37 @@ class CloudbreakClient {
         };
 
         if (image == null || image == "") {
-            def binding = ["STACK_NAME"    : stackName,
-                           "CREDENTIAL_ID" : credentialId,
-                           "REGION"        : region,
-                           "ON_FAILURE"    : onFailure,
-                           "THRESHOLD"     : threshold,
-                           "ADJUSTMENTTYPE": adjustmentType,
-                           "GROUPS"        : group.toString().substring(0, group.toString().length() - 1),
-                           "NETWORK_ID"    : networkId,
-                           "SECURITY_GROUP": securityGroupId,
-                           "PLATFORM_VARIANT": platformVariant ? platformVariant : "",
-                           "PARAMETERS"    : new JsonBuilder(params).toPrettyString()]
+            def binding = ["STACK_NAME"       : stackName,
+                           "CREDENTIAL_ID"    : credentialId,
+                           "REGION"           : region,
+                           "ON_FAILURE"       : onFailure,
+                           "AVAILABILITYZONE" : availabilityZone,
+                           "THRESHOLD"        : threshold,
+                           "ADJUSTMENTTYPE"   : adjustmentType,
+                           "GROUPS"           : group.toString().substring(0, group.toString().length() - 1),
+                           "NETWORK_ID"       : networkId,
+                           "SECURITY_GROUP"   : securityGroupId,
+                           "PLATFORM_VARIANT" : platformVariant ? platformVariant : "",
+                           "PARAMETERS"       : new JsonBuilder(params).toPrettyString()]
             if (publicInAccount) {
                 response = processPost(Resource.ACCOUNT_STACKS, binding)
             } else {
                 response = processPost(Resource.USER_STACKS, binding)
             }
         } else {
-            def binding = ["STACK_NAME"    : stackName,
-                           "CREDENTIAL_ID" : credentialId,
-                           "REGION"        : region,
-                           "IMAGE"         : image,
-                           "ON_FAILURE"    : onFailure,
-                           "THRESHOLD"     : threshold,
-                           "ADJUSTMENTTYPE": adjustmentType,
-                           "GROUPS"        : group.toString().substring(0, group.toString().length() - 1),
-                           "NETWORK_ID"    : networkId,
-                           "SECURITY_GROUP": securityGroupId,
-                           "PLATFORM_VARIANT": platformVariant ? platformVariant : "",
-                           "PARAMETERS"    : new JsonBuilder(params).toPrettyString()]
+            def binding = ["STACK_NAME"       : stackName,
+                           "CREDENTIAL_ID"    : credentialId,
+                           "REGION"           : region,
+                           "AVAILABILITYZONE" : availabilityZone,
+                           "IMAGE"            : image,
+                           "ON_FAILURE"       : onFailure,
+                           "THRESHOLD"        : threshold,
+                           "ADJUSTMENTTYPE"   : adjustmentType,
+                           "GROUPS"           : group.toString().substring(0, group.toString().length() - 1),
+                           "NETWORK_ID"       : networkId,
+                           "SECURITY_GROUP"   : securityGroupId,
+                           "PLATFORM_VARIANT" : platformVariant ? platformVariant : "",
+                           "PARAMETERS"       : new JsonBuilder(params).toPrettyString()]
             if (publicInAccount) {
                 response = processPost(Resource.ACCOUNT_STACKS_WITH_IMAGE, binding)
             } else {
