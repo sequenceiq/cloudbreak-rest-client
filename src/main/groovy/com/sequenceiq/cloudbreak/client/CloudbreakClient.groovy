@@ -118,37 +118,37 @@ class CloudbreakClient {
         };
 
         if (image == null || image == "") {
-            def binding = ["STACK_NAME"       : stackName,
-                           "CREDENTIAL_ID"    : credentialId,
-                           "REGION"           : region,
-                           "ON_FAILURE"       : onFailure,
-                           "AVAILABILITYZONE" : availabilityZone,
-                           "THRESHOLD"        : threshold,
-                           "ADJUSTMENTTYPE"   : adjustmentType,
-                           "GROUPS"           : group.toString().substring(0, group.toString().length() - 1),
-                           "NETWORK_ID"       : networkId,
-                           "SECURITY_GROUP"   : securityGroupId,
-                           "PLATFORM_VARIANT" : platformVariant ? platformVariant : "",
-                           "PARAMETERS"       : new JsonBuilder(params).toPrettyString()]
+            def binding = ["STACK_NAME"      : stackName,
+                           "CREDENTIAL_ID"   : credentialId,
+                           "REGION"          : region,
+                           "ON_FAILURE"      : onFailure,
+                           "AVAILABILITYZONE": availabilityZone,
+                           "THRESHOLD"       : threshold,
+                           "ADJUSTMENTTYPE"  : adjustmentType,
+                           "GROUPS"          : group.toString().substring(0, group.toString().length() - 1),
+                           "NETWORK_ID"      : networkId,
+                           "SECURITY_GROUP"  : securityGroupId,
+                           "PLATFORM_VARIANT": platformVariant ? platformVariant : "",
+                           "PARAMETERS"      : new JsonBuilder(params).toPrettyString()]
             if (publicInAccount) {
                 response = processPost(Resource.ACCOUNT_STACKS, binding)
             } else {
                 response = processPost(Resource.USER_STACKS, binding)
             }
         } else {
-            def binding = ["STACK_NAME"       : stackName,
-                           "CREDENTIAL_ID"    : credentialId,
-                           "REGION"           : region,
-                           "AVAILABILITYZONE" : availabilityZone,
-                           "IMAGE"            : image,
-                           "ON_FAILURE"       : onFailure,
-                           "THRESHOLD"        : threshold,
-                           "ADJUSTMENTTYPE"   : adjustmentType,
-                           "GROUPS"           : group.toString().substring(0, group.toString().length() - 1),
-                           "NETWORK_ID"       : networkId,
-                           "SECURITY_GROUP"   : securityGroupId,
-                           "PLATFORM_VARIANT" : platformVariant ? platformVariant : "",
-                           "PARAMETERS"       : new JsonBuilder(params).toPrettyString()]
+            def binding = ["STACK_NAME"      : stackName,
+                           "CREDENTIAL_ID"   : credentialId,
+                           "REGION"          : region,
+                           "AVAILABILITYZONE": availabilityZone,
+                           "IMAGE"           : image,
+                           "ON_FAILURE"      : onFailure,
+                           "THRESHOLD"       : threshold,
+                           "ADJUSTMENTTYPE"  : adjustmentType,
+                           "GROUPS"          : group.toString().substring(0, group.toString().length() - 1),
+                           "NETWORK_ID"      : networkId,
+                           "SECURITY_GROUP"  : securityGroupId,
+                           "PLATFORM_VARIANT": platformVariant ? platformVariant : "",
+                           "PARAMETERS"      : new JsonBuilder(params).toPrettyString()]
             if (publicInAccount) {
                 response = processPost(Resource.ACCOUNT_STACKS_WITH_IMAGE, binding)
             } else {
@@ -422,35 +422,35 @@ class CloudbreakClient {
         def stackDetails = null
         def fileSystem = null
         if (fileSytemType) {
-          fileSystem = ["name"        : name,
-                      "type"        : fileSytemType,
-                      "defaultFs"   : defaultFs,
-                      "properties"  : properties
-          ]
+            fileSystem = ["name"      : name,
+                          "type"      : fileSytemType,
+                          "defaultFs" : defaultFs,
+                          "properties": properties
+            ]
         }
         if (stack) {
-          stackDetails = ["stack"       : stack,
-                        "version"     : version,
-                        "os"          : os,
-                        "stackRepoId" : stackRepoId,
-                        "stackBaseURL": stackBaseURL,
-                        "utilsRepoId" : utilsRepoId,
-                        "utilsBaseURL": utilsBaseURL,
-                        "verify"      : verify
-          ]
+            stackDetails = ["stack"       : stack,
+                            "version"     : version,
+                            "os"          : os,
+                            "stackRepoId" : stackRepoId,
+                            "stackBaseURL": stackBaseURL,
+                            "utilsRepoId" : utilsRepoId,
+                            "utilsBaseURL": utilsBaseURL,
+                            "verify"      : verify
+            ]
         }
-        def binding = ["NAME"         : name,
-                     "BLUEPRINT_ID" : blueprintId,
-                     "DESCRIPTION"  : description,
-                     "HOSTGROUPS"   : hostGroupsJson,
-                     "USERNAME"     : userName,
-                     "PASSWORD"     : password,
-                     "STACK_DETAILS": new JsonBuilder(stackDetails).toPrettyString(),
-                     "FILESYSTEM": new JsonBuilder(fileSystem).toPrettyString(),
-                     "ENABLE_SECURITY": enableSecurity,
-                     "KERBEROS_MASTER_KEY": kerberosMasterKey ? "\"$kerberosMasterKey\"" : null,
-                     "KERBEROS_ADMIN": kerberosAdmin ? "\"$kerberosAdmin\"" : null,
-                     "KERBEROS_PASSWORD": kerberosPassword ? "\"$kerberosPassword\"" : null,
+        def binding = ["NAME"               : name,
+                       "BLUEPRINT_ID"       : blueprintId,
+                       "DESCRIPTION"        : description,
+                       "HOSTGROUPS"         : hostGroupsJson,
+                       "USERNAME"           : userName,
+                       "PASSWORD"           : password,
+                       "STACK_DETAILS"      : new JsonBuilder(stackDetails).toPrettyString(),
+                       "FILESYSTEM"         : new JsonBuilder(fileSystem).toPrettyString(),
+                       "ENABLE_SECURITY"    : enableSecurity,
+                       "KERBEROS_MASTER_KEY": kerberosMasterKey ? "\"$kerberosMasterKey\"" : null,
+                       "KERBEROS_ADMIN"     : kerberosAdmin ? "\"$kerberosAdmin\"" : null,
+                       "KERBEROS_PASSWORD"  : kerberosPassword ? "\"$kerberosPassword\"" : null,
         ]
         def json = createJson(Resource.CLUSTERS.template(), binding)
         String path = Resource.CLUSTERS.path().replaceFirst("stack-id", stackId.toString())
@@ -882,8 +882,8 @@ class CloudbreakClient {
     }
 
     def Object getPlatformVariants() {
-      Map getCtx = createGetRequestContext(Resource.GLOBAL_STACKS_PLATFORM_VARIANT.path())
-      return doGet(getCtx)?.data
+        Map getCtx = createGetRequestContext(Resource.GLOBAL_STACKS_PLATFORM_VARIANT.path())
+        return doGet(getCtx)?.data
     }
 
     def private String postNetwork(Resource accountResource, Resource userResource, Map binding, Boolean publicInAccount) {
@@ -897,14 +897,17 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postSecurityGroup(String name, String description, List<Map<String, String>> securityRules, Boolean publicInAccount) throws Exception {
-        def rulesRequest = [
-                "name": name,
-                "description": description,
+    def String postSecurityGroup(String name, String description, Map<String, String> tcpRules, Map<String, String> udpRules, Boolean publicInAccount) throws Exception {
+        def tcp = tcpRules.collect { ["protocol": "tcp", "subnet": it.key, "ports": it.value] }
+        def udp = udpRules.collect { ["protocol": "udp", "subnet": it.key, "ports": it.value] }
+        def securityRules = tcp + udp
+        def securityGroup = [
+                "name"         : name,
+                "description"  : description,
                 "securityRules": securityRules
         ]
         def resource = publicInAccount ? Resource.ACCOUNT_SECURITY_GROUPS : Resource.USER_SECURITY_GROUPS
-        def postCtx = createPostRequestContext(resource.path(), ['json': new JsonBuilder(rulesRequest).toPrettyString()])
+        def postCtx = createPostRequestContext(resource.path(), ['json': new JsonBuilder(securityGroup).toPrettyString()])
         def response = doPost(postCtx)
         return response?.data?.id
     }
