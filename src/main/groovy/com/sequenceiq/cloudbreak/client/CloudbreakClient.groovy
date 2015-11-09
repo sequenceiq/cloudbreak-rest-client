@@ -46,6 +46,7 @@ class CloudbreakClient {
         GLOBAL_STACKS_STATUS_PUT("stacks", "stack_status_put.json"),
         GLOBAL_STACKS("stacks", ""),
         GLOBAL_STACKS_PLATFORM_VARIANT("stacks/platformVariants", ""),
+        GLOBAL_CONNECTOR_PARAMS("connectors", ""),
         STACK_AMBARI("stacks/ambari", ""),
         USER_BLUEPRINTS("user/blueprints", "blueprint.json"),
         ACCOUNT_BLUEPRINTS("account/blueprints", "blueprint.json"),
@@ -883,6 +884,11 @@ class CloudbreakClient {
 
     def Object getPlatformVariants() {
       Map getCtx = createGetRequestContext(Resource.GLOBAL_STACKS_PLATFORM_VARIANT.path())
+      return doGet(getCtx)?.data
+    }
+
+    def Object getCloudConnectorParams() {
+      Map getCtx = createGetRequestContext(Resource.GLOBAL_CONNECTOR_PARAMS.path())
       return doGet(getCtx)?.data
     }
 
