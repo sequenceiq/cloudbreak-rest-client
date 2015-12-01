@@ -4,7 +4,5 @@
     "description": "$DESCRIPTION",
     "volumeCount": "$VOLUME_COUNT",
     "volumeSize": "$VOLUME_SIZE",
-    "parameters": {
-        "instanceType": "$INSTANCE_TYPE"
-    }
+    "instanceType": "$INSTANCE_TYPE"
 }
