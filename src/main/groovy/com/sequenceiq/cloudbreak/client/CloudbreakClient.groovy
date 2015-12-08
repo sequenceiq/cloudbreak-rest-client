@@ -14,14 +14,12 @@ class CloudbreakClient {
     def private enum Resource {
         USER_CREDENTIALS("user/credentials", "credentials.json"),
         USER_CREDENTIALS_EC2("user/credentials", "credentials_ec2.json"),
-        USER_CREDENTIALS_AZURE("user/credentials", "credentials_azure.json"),
         USER_CREDENTIALS_AZURE_RM("user/credentials", "credentials_azure_rm.json"),
         USER_CREDENTIALS_GCP("user/credentials", "credentials_gcp.json"),
         USER_CREDENTIALS_OPENSTACK("user/credentials", "credentials_openstack.json"),
         ACCOUNT_CREDENTIALS("account/credentials", "credentials.json"),
         ACCOUNT_CREDENTIALS_EC2("account/credentials", "credentials_ec2.json"),
         ACCOUNT_CREDENTIALS_OPENSTACK("account/credentials", "credentials_openstack.json"),
-        ACCOUNT_CREDENTIALS_AZURE("account/credentials", "credentials_azure.json"),
         ACCOUNT_CREDENTIALS_AZURE_RM("account/credentials", "credentials_azure_rm.json"),
         ACCOUNT_CREDENTIALS_GCP("account/credentials", "credentials_gcp.json"),
         GLOBAL_CREDENTIALS("credentials", ""),
@@ -54,7 +52,6 @@ class CloudbreakClient {
         CLUSTER_NODECOUNT_PUT("stacks/stack-id/cluster", "cluster_nodecount_put.json"),
         CLUSTER_STATUS_PUT("stacks/stack-id/cluster", "cluster_status_put.json"),
         CLUSTERS("stacks/stack-id/cluster", "cluster.json"),
-        CERTIFICATES("credentials/certificate", "certificate.json"),
         ACCOUNT_RECIPES("account/recipes", "recipe.json"),
         USER_RECIPES("user/recipes", "recipe.json"),
         GLOBAL_RECIPES("recipes", ""),
@@ -223,19 +220,6 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postAzureCredential(String name, String description, String subscriptionId, String sshKey, Boolean publicInAccount) throws Exception {
-        log.debug("Posting credential ...")
-        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "SUBSCRIPTIONID": subscriptionId, "SSHKEY": sshKey]
-        def response;
-        if (publicInAccount) {
-            response = processPost(Resource.ACCOUNT_CREDENTIALS_AZURE, binding)
-        } else {
-            response = processPost(Resource.USER_CREDENTIALS_AZURE, binding)
-        }
-        log.debug("Got response: {}", response.data.id)
-        return response?.data?.id
-    }
-
     def String postAzureRmCredential(String name, String description, String subscriptionId, String tenantId, String accesKey, String secretKey, String sshKey, Boolean publicInAccount) throws Exception {
         log.debug("Posting credential ...")
         def binding = ["CLOUD_PLATFORM": "AZURE_RM", "NAME": name, "DESCRIPTION": description, "SUBSCRIPTIONID": subscriptionId, "SECRETKEY": secretKey, "TENANTID": tenantId, "ACCESKEY": accesKey, "SSHKEY": sshKey]
@@ -247,10 +231,6 @@ class CloudbreakClient {
         }
         log.debug("Got response: {}", response.data.id)
         return response?.data?.id
-    }
-
-    def String getCertificate(String id) throws Exception {
-        return getOne(Resource.CERTIFICATES, id).text
     }
 
     def String postSpotEc2Template(String name, String description, String sshLocation, String instanceType, String volumeCount, String volumeSize, String volumeType, String spotPrice, Boolean publicInAccount, Boolean encrypted) throws Exception {
@@ -860,7 +840,7 @@ class CloudbreakClient {
 
     def String postAzureNetwork(String name, String description, String subnetCIDR, String addressPrefixCIDR, Boolean publicInAccount) throws Exception {
         log.debug("Posting Azure network ...")
-        def binding = ["CLOUD_PLATFORM": "AZURE", "NAME": name, "DESCRIPTION": description, "SUBNET_CIDR": subnetCIDR, "ADDRESS_PREFIX_CIDR": addressPrefixCIDR]
+        def binding = ["CLOUD_PLATFORM": "AZURE_RM", "NAME": name, "DESCRIPTION": description, "SUBNET_CIDR": subnetCIDR, "ADDRESS_PREFIX_CIDR": addressPrefixCIDR]
         return postNetwork(Resource.ACCOUNT_NETWORKS_AZURE, Resource.USER_NETWORKS_AZURE, binding, publicInAccount)
     }
 
