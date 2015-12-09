@@ -196,9 +196,9 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postOpenStackCredential(String name, String description, String userName, String password, String tenantName, String endPoint, String sshKey, Boolean publicInAccount) throws Exception {
+    def String postOpenStackCredential(String name, String description, String userName, String password, String tenantName, String endPoint, String sshKey, String selector, String keystoneVersion, String userDomain, String keystoneAuthScope, String domainName, String projectDomainName, String projectName, Boolean publicInAccount) throws Exception {
         log.debug("Posting credential ...")
-        def binding = ["CLOUD_PLATFORM": "OPENSTACK", "NAME": name, "USERNAME": userName, "PASSWORD": password, "TENANTNAME": tenantName, "ENDPOINT": endPoint, "DESCRIPTION": description, "SSHKEY": sshKey]
+        def binding = ["CLOUD_PLATFORM": "OPENSTACK", "NAME": name, "USERNAME": userName, "SELECTOR": selector, "KEYSTONE_VERSION": keystoneVersion, "KEYSTONEAUTHSCOPE": keystoneAuthScope, "USERDOMAIN": userDomain, "DOMAINNAME": domainName, "PROJECTDOMAINNAME": projectDomainName, "PROJECTNAME": projectName, "PASSWORD": password, "TENANTNAME": tenantName, "ENDPOINT": endPoint, "DESCRIPTION": description, "SSHKEY": sshKey]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_CREDENTIALS_OPENSTACK, binding)
@@ -220,9 +220,9 @@ class CloudbreakClient {
         return response?.data?.id
     }
 
-    def String postAzureRmCredential(String name, String description, String subscriptionId, String tenantId, String accesKey, String secretKey, String sshKey, Boolean publicInAccount) throws Exception {
+    def String postAzureRmCredential(String name, String description, String subscriptionId, String tenantId, String accessKey, String secretKey, String sshKey, Boolean publicInAccount) throws Exception {
         log.debug("Posting credential ...")
-        def binding = ["CLOUD_PLATFORM": "AZURE_RM", "NAME": name, "DESCRIPTION": description, "SUBSCRIPTIONID": subscriptionId, "SECRETKEY": secretKey, "TENANTID": tenantId, "ACCESKEY": accesKey, "SSHKEY": sshKey]
+        def binding = ["CLOUD_PLATFORM": "AZURE_RM", "NAME": name, "DESCRIPTION": description, "SUBSCRIPTIONID": subscriptionId, "SECRETKEY": secretKey, "TENANTID": tenantId, "ACCESSKEY": accessKey, "SSHKEY": sshKey]
         def response;
         if (publicInAccount) {
             response = processPost(Resource.ACCOUNT_CREDENTIALS_AZURE_RM, binding)
