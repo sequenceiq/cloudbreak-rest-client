@@ -1,8 +1,0 @@
-{
-    "cloudPlatform": "$CLOUD_PLATFORM",
-    "name": "$NAME",
-    "description": "$DESCRIPTION",
-    "volumeCount": "$VOLUME_COUNT",
-    "volumeSize": "$VOLUME_SIZE",
-    "instanceType": "$INSTANCE_TYPE"
-}

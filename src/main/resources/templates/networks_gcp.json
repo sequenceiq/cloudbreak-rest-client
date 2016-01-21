@@ -1,7 +1,0 @@
-{
-  "name":"$NAME",
-  "description":${DESCRIPTION == null ? 'null' : "\"$DESCRIPTION\""},
-  "subnetCIDR":"$SUBNET_CIDR",
-  "cloudPlatform":"$CLOUD_PLATFORM",
-  "parameters":{}
-}
